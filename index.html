@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Card Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+  :root{
+    --ink:#16213E;
+    --ink-soft:#5B6472;
+    --paper:#EEF0F2;
+    --surface:#FFFFFF;
+    --brass:#A9762F;
+    --brass-dark:#8C6224;
+    --pine:#2F5D50;
+    --rust:#A23E33;
+    --line:#DCDFE4;
+    --shadow: 0 1px 0 rgba(22,33,62,0.04);
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .app{
+    max-width:560px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--paper);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* ---------- Header ---------- */
+  header.top{
+    background:var(--ink);
+    color:#fff;
+    padding:20px 18px 16px;
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .top-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.5rem;
+    letter-spacing:0.2px;
+  }
+  .brand small{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-size:0.68rem;
+    font-weight:500;
+    color:#B9C0CE;
+    letter-spacing:0.3px;
+    margin-top:2px;
+  }
+  .icon-btn{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.28);
+    color:#fff;
+    width:38px;height:38px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .icon-btn svg{width:18px;height:18px;}
+  .icon-btn.pine{border-color:rgba(120,200,170,0.5);}
+  .search-wrap{
+    margin-top:14px;
+    position:relative;
+  }
+  .search-wrap svg{
+    position:absolute;
+    left:13px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;
+    color:var(--ink-soft);
+  }
+  .search-wrap input{
+    width:100%;
+    background:#fff;
+    border:none;
+    border-radius:8px;
+    padding:11px 12px 11px 36px;
+    font-size:0.92rem;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+  }
+  .search-wrap input:focus{outline:2px solid var(--brass);outline-offset:1px;}
+
+  .col-labels{
+    display:flex;
+    padding:12px 18px 8px;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    font-weight:600;
+    border-bottom:1px solid var(--line);
+  }
+  .col-labels .c1{width:50px;flex-shrink:0;}
+  .col-labels .c2{flex:1;}
+  .col-labels .c3{width:96px;flex-shrink:0;text-align:right;}
+
+  /* ---------- List ---------- */
+  main{flex:1;overflow-y:auto;padding-bottom:96px;}
+  .row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 18px;
+    border-bottom:1px solid var(--line);
+    background:var(--surface);
+    cursor:pointer;
+  }
+  .row:active{background:#F5F3EE;}
+  .thumb{
+    width:50px;height:36px;
+    border-radius:3px;
+    object-fit:cover;
+    flex-shrink:0;
+    box-shadow:0 1px 3px rgba(22,33,62,0.25);
+    transform:rotate(-1.5deg);
+    border:1px solid rgba(0,0,0,0.06);
+  }
+  .thumb.placeholder{
+    display:flex;align-items:center;justify-content:center;
+    background:#E4E7EB;
+    color:var(--ink-soft);
+    transform:none;
+  }
+  .thumb.placeholder svg{width:16px;height:16px;}
+  .row-main{flex:1;min-width:0;}
+  .row-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.02rem;
+    line-height:1.2;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .row-org{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    margin-top:2px;
+  }
+  .row-project{
+    font-size:0.78rem;
+    color:var(--brass-dark);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    margin-top:1px;
+  }
+  .row-last{
+    width:96px;flex-shrink:0;text-align:right;
+  }
+  .row-last .type{
+    font-size:0.72rem;
+    color:var(--brass-dark);
+    font-weight:600;
+  }
+  .row-last .date{
+    font-size:0.82rem;
+    font-weight:700;
+    color:var(--ink);
+    margin-top:1px;
+  }
+
+  .empty-state{
+    padding:60px 32px;
+    text-align:center;
+    color:var(--ink-soft);
+  }
+  .empty-state h2{
+    font-family:'Fraunces',serif;
+    color:var(--ink);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .empty-state p{font-size:0.9rem;line-height:1.5;}
+
+  /* ---------- Bottom action bar ---------- */
+  .action-bar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    max-width:560px;
+    margin:0 auto;
+    display:flex;
+    gap:10px;
+    padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(to top, var(--paper) 70%, rgba(238,240,242,0));
+    z-index:15;
+  }
+  .btn{
+    flex:1;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 14px;
+    border-radius:8px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.9rem;
+    border:none;
+    cursor:pointer;
+  }
+  .btn svg{width:17px;height:17px;}
+  .btn.primary{background:var(--brass);color:#fff;}
+  .btn.primary:active{background:var(--brass-dark);}
+  .btn.outline{background:#fff;color:var(--ink);border:1.5px solid var(--ink);}
+  .btn.outline:active{background:#EDEEF0;}
+  .btn.pine{background:var(--pine);color:#fff;}
+  .btn.rust{background:transparent;color:var(--rust);border:1.5px solid var(--rust);}
+  .btn.block{width:100%;}
+
+  /* ---------- Sheets / modals ---------- */
+  .sheet-backdrop{
+    position:fixed;inset:0;
+    background:rgba(22,33,62,0.45);
+    z-index:30;
+    display:none;
+  }
+  .sheet-backdrop.open{display:block;}
+  .sheet{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    max-width:560px;
+    margin:0 auto;
+    background:var(--paper);
+    border-radius:16px 16px 0 0;
+    max-height:92vh;
+    display:flex;flex-direction:column;
+    transform:translateY(100%);
+    transition:transform 0.28s ease;
+    z-index:31;
+  }
+  .sheet.open{transform:translateY(0);}
+  .sheet-handle{
+    width:36px;height:4px;
+    background:var(--line);
+    border-radius:2px;
+    margin:10px auto 4px;
+  }
+  .sheet-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:6px 18px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  .sheet-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.15rem;
+  }
+  .sheet-body{
+    padding:16px 18px 28px;
+    overflow-y:auto;
+  }
+  .card-photo{
+    width:100%;
+    max-height:220px;
+    object-fit:contain;
+    background:#1B2A46;
+    border-radius:10px;
+    margin-bottom:16px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:0.72rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;
+    padding:10px 11px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-family:'Inter',sans-serif;
+    font-size:0.92rem;
+    color:var(--ink);
+    background:#fff;
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .field-row{display:flex;gap:10px;}
+  .field-row .field{flex:1;}
+
+  .history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-item .h-type{font-weight:600;font-size:0.88rem;}
+  .history-item .h-note{color:var(--ink-soft);font-size:0.78rem;display:block;}
+  .history-item .h-date{font-size:0.82rem;color:var(--ink-soft);white-space:nowrap;padding-left:10px;}
+
+  .section-label{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:0.98rem;
+    margin:18px 0 8px;
+  }
+  .log-form{
+    display:flex;gap:8px;margin-bottom:10px;
+  }
+  .log-form select, .log-form input{
+    padding:9px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-size:0.85rem;
+  }
+  .log-form button{
+    background:var(--pine);color:#fff;border:none;border-radius:7px;
+    padding:0 14px;font-weight:600;font-size:0.85rem;cursor:pointer;
+  }
+
+  .settings-note{
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:12px 13px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    line-height:1.55;
+    margin-bottom:14px;
+  }
+  .settings-note b{color:var(--ink);}
+  .settings-note ol{margin:6px 0 0;padding-left:18px;}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:0.76rem;font-weight:600;
+    padding:4px 9px;border-radius:20px;
+    background:#E4EDE9;color:var(--pine);
+    margin-bottom:12px;
+  }
+  .status-pill.warn{background:#F4E4DF;color:var(--rust);}
+  .hidden{display:none !important;}
+  .toast{
+    position:fixed;
+    bottom:100px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;
+    padding:10px 18px;border-radius:20px;
+    font-size:0.85rem;
+    z-index:50;
+    opacity:0;
+    transition:opacity 0.25s ease;
+    pointer-events:none;
+    max-width:90%;
+    text-align:center;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">Card Ledger<small>Every card you've collected, in one place</small></div>
+      <div style="display:flex;gap:8px;">
+        <button class="icon-btn pine" id="syncBtn" title="Sync with Google Drive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        </button>
+        <button class="icon-btn" id="settingsBtn" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009.2 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9.2a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Search name, company or project…">
+    </div>
+  </header>
+
+  <div class="col-labels">
+    <div class="c1">Card</div>
+    <div class="c2">Name / Company</div>
+    <div class="c3">Last contact</div>
+  </div>
+
+  <main id="listWrap">
+    <!-- rows injected here -->
+  </main>
+
+  <div class="action-bar">
+    <button class="btn primary" id="scanBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Scan card
+    </button>
+    <button class="btn outline" id="addBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Add manually
+    </button>
+  </div>
+</div>
+
+<input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
+<input type="file" accept="image/*" id="retakeInput" class="hidden">
+<input type="file" accept="application/json" id="restoreInput" class="hidden">
+
+<!-- Backdrop shared -->
+<div class="sheet-backdrop" id="backdrop"></div>
+
+<!-- Add / Edit sheet -->
+<div class="sheet" id="editSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="editTitle">New contact</div>
+    <button class="icon-btn outline-none" id="editClose" style="border:none;color:var(--ink);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <img id="editPhotoPreview" class="card-photo hidden">
+    <div id="ocrStatus" class="status-pill hidden">Reading text from the card…</div>
+    <button class="btn outline block" id="editRetakeBtn" style="margin-bottom:16px;">Add / retake card photo</button>
+
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="fName" placeholder="e.g. John Smith">
+    </div>
+    <div class="field">
+      <label>Company</label>
+      <input type="text" id="fOrg" placeholder="e.g. Tech Solutions Inc.">
+    </div>
+    <div class="field">
+      <label>Project / role (optional)</label>
+      <input type="text" id="fProject" placeholder="e.g. Warehouse automation deal">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" id="fPhone">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="fEmail">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>How did you get this card?</label>
+        <select id="fType">
+          <option>Met</option>
+          <option>Contacted</option>
+          <option>Called</option>
+          <option>Emailed</option>
+          <option>Visited</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="fDate">
+      </div>
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="fNotes" placeholder="Anything worth remembering…"></textarea>
+    </div>
+    <button class="btn primary block" id="saveBtn">Save contact</button>
+  </div>
+</div>
+
+<!-- Detail sheet -->
+<div class="sheet" id="detailSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="detailName">Name</div>
+    <button class="icon-btn" id="detailClose" style="border:none;color:var(--ink);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <img id="detailPhoto" class="card-photo hidden">
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="dName">
+    </div>
+    <div class="field">
+      <label>Company</label>
+      <input type="text" id="dOrg">
+    </div>
+    <div class="field">
+      <label>Project / role</label>
+      <input type="text" id="dProject">
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Phone</label><input type="tel" id="dPhone"></div>
+      <div class="field"><label>Email</label><input type="email" id="dEmail"></div>
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="dNotes"></textarea>
+    </div>
+    <button class="btn outline block" id="dSaveBtn">Save changes</button>
+
+    <div class="section-label">Log a new interaction</div>
+    <div class="log-form">
+      <select id="dLogType">
+        <option>Contacted</option><option>Met</option><option>Called</option><option>Emailed</option><option>Visited</option>
+      </select>
+      <input type="date" id="dLogDate">
+      <button id="dLogAdd">Add</button>
+    </div>
+
+    <div class="section-label">History</div>
+    <div id="dHistory"></div>
+
+    <div style="margin-top:22px;display:flex;gap:10px;">
+      <button class="btn outline" id="dRetakeBtn">Replace photo</button>
+      <button class="btn rust" id="dDeleteBtn">Delete contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings sheet -->
+<div class="sheet" id="settingsSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title">Settings & sync</div>
+    <button class="icon-btn" id="settingsClose" style="border:none;color:var(--ink);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <div id="storageStatus" class="status-pill">Stored on this device only</div>
+
+    <div class="section-label">Local backup</div>
+    <div class="settings-note">Everything is saved on this device automatically (photos included). Use these buttons any time to make a portable copy, or move that copy into your own Google Drive folder manually.</div>
+    <div style="display:flex;gap:10px;margin-bottom:22px;">
+      <button class="btn outline" id="backupBtn">Download backup</button>
+      <button class="btn outline" id="restoreBtn">Restore backup</button>
+    </div>
+
+    <div class="section-label">Google Drive sync (optional)</div>
+    <div class="settings-note" id="driveNote">
+      This connects directly to <b>your</b> Google Drive using Google's own sign-in — no data passes through any other server.
+      <ol>
+        <li>In <b>Google Cloud Console</b>, create a project and an OAuth Client ID (type: Web application).</li>
+        <li>Add the exact address this page is hosted at to <b>Authorized JavaScript origins</b>.</li>
+        <li>Paste that Client ID below and tap Connect.</li>
+      </ol>
+      <span id="fileProtocolWarn" class="hidden" style="color:var(--rust);display:block;margin-top:8px;">
+        <b>This copy is open as a local file</b>, and Google does not allow sign-in from local files. Host this page (for example on GitHub Pages) and open it from that address to use Drive sync.
+      </span>
+    </div>
+    <div class="field">
+      <label>Google OAuth Client ID</label>
+      <input type="text" id="clientIdInput" placeholder="xxxxx.apps.googleusercontent.com">
+    </div>
+    <button class="btn pine block" id="connectDriveBtn" style="margin-bottom:10px;">Connect & sync now</button>
+    <button class="btn outline block" id="disconnectDriveBtn">Disconnect Drive</button>
+    <div id="lastSyncNote" class="settings-note hidden" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============ IndexedDB layer ============ */
+const DB_NAME = "cardLedgerDB", DB_VERSION = 1;
+let dbPromise = new Promise((resolve, reject) => {
+  const req = indexedDB.open(DB_NAME, DB_VERSION);
+  req.onupgradeneeded = (e) => {
+    const db = e.target.result;
+    if(!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", {keyPath:"id"});
+    if(!db.objectStoreNames.contains("settings")) db.createObjectStore("settings", {keyPath:"key"});
+  };
+  req.onsuccess = (e) => resolve(e.target.result);
+  req.onerror = (e) => reject(e.target.error);
+});
+
+function tx(store, mode){ return dbPromise.then(db => db.transaction(store, mode).objectStore(store)); }
+function getAll(store){ return tx(store,"readonly").then(s => new Promise((res,rej)=>{ const r=s.getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })); }
+function put(store, val){ return tx(store,"readwrite").then(s => new Promise((res,rej)=>{ const r=s.put(val); r.onsuccess=()=>res(val); r.onerror=()=>rej(r.error); })); }
+function del(store, key){ return tx(store,"readwrite").then(s => new Promise((res,rej)=>{ const r=s.delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); })); }
+function getOne(store, key){ return tx(store,"readonly").then(s => new Promise((res,rej)=>{ const r=s.get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })); }
+
+function getSetting(key, fallback){ return getOne("settings", key).then(r => r ? r.value : fallback); }
+function setSetting(key, value){ return put("settings", {key, value}); }
+
+/* ============ State ============ */
+let contacts = [];
+let activeId = null;
+let pendingPhoto = { thumb:null, image:null };
+
+const $ = (id) => document.getElementById(id);
+const todayStr = () => new Date().toISOString().slice(0,10);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+
+function showToast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+function lastEntry(c){
+  if(!c.history || !c.history.length) return null;
+  return c.history.slice().sort((a,b)=> a.date < b.date ? 1 : -1)[0];
+}
+
+function fmtDate(iso){
+  if(!iso) return "—";
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString(undefined, {month:"short", day:"2-digit", year:"numeric"});
+}
+
+/* ============ Image capture / resize ============ */
+function fileToImage(file){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{ URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+function resize(img, maxW){
+  const scale = Math.min(1, maxW / img.width);
+  const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL("image/jpeg", 0.72);
+}
+async function processImageFile(file){
+  const img = await fileToImage(file);
+  return { thumb: resize(img, 320), image: resize(img, 1280) };
+}
+
+/* ============ Rendering ============ */
+function renderList(){
+  const q = $("searchInput").value.trim().toLowerCase();
+  const wrap = $("listWrap");
+  let list = contacts.slice();
+  if(q){
+    list = list.filter(c =>
+      (c.name||"").toLowerCase().includes(q) ||
+      (c.org||"").toLowerCase().includes(q) ||
+      (c.project||"").toLowerCase().includes(q)
+    );
+  }
+  list.sort((a,b)=>{
+    const la = lastEntry(a), lb = lastEntry(b);
+    const da = la ? la.date : a.createdAt.slice(0,10);
+    const db_ = lb ? lb.date : b.createdAt.slice(0,10);
+    return da < db_ ? 1 : -1;
+  });
+
+  if(!list.length){
+    wrap.innerHTML = `<div class="empty-state">
+      <h2>${contacts.length ? "No matches" : "No cards yet"}</h2>
+      <p>${contacts.length ? "Try a different name, company or project." : "Tap “Scan card” below and point your camera at a business card to add your first contact."}</p>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(c => {
+    const le = lastEntry(c);
+    const thumb = c.thumb
+      ? `<img class="thumb" src="${c.thumb}" alt="">`
+      : `<div class="thumb placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M15 10h4M15 14h4"/></svg></div>`;
+    return `<div class="row" data-id="${c.id}">
+      ${thumb}
+      <div class="row-main">
+        <div class="row-name">${escapeHtml(c.name || "Unnamed")}</div>
+        <div class="row-org">${escapeHtml(c.org || "—")}</div>
+        ${c.project ? `<div class="row-project">${escapeHtml(c.project)}</div>` : ""}
+      </div>
+      <div class="row-last">
+        <div class="type">${le ? le.type : "Added"}</div>
+        <div class="date">${fmtDate(le ? le.date : c.createdAt.slice(0,10))}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+
+/* ============ Sheets ============ */
+function openSheet(id){ $("backdrop").classList.add("open"); $(id).classList.add("open"); }
+function closeSheets(){
+  $("backdrop").classList.remove("open");
+  ["editSheet","detailSheet","settingsSheet"].forEach(id => $(id).classList.remove("open"));
+}
+$("backdrop").addEventListener("click", closeSheets);
+
+/* ============ Add / Edit new contact ============ */
+function resetEditForm(){
+  ["fName","fOrg","fProject","fPhone","fEmail","fNotes"].forEach(id => $(id).value = "");
+  $("fType").value = "Met";
+  $("fDate").value = todayStr();
+  pendingPhoto = { thumb:null, image:null };
+  $("editPhotoPreview").classList.add("hidden");
+  $("ocrStatus").classList.add("hidden");
+  $("editTitle").textContent = "New contact";
+}
+
+/* ============ OCR (on-device, via Tesseract.js) ============ */
+function parseCardText(text){
+  const rawLines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const emailRe = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+  const phoneRe = /(\+?\d[\d\s().-]{6,}\d)/;
+  const orgRe = /\b(inc|ltd|llc|corp|co\.?|company|group|industries|solutions|enterprises|pvt|limited|technologies|systems|associates|partners|studio)\b/i;
+  const namePatternRe = /^[A-Z][a-zA-Z.'-]+(\s+[A-Z][a-zA-Z.'-]+){1,3}$/;
+
+  let email = "", phone = "", org = "", name = "";
+  const used = new Set();
+
+  rawLines.forEach((line, i) => {
+    if(!email){ const m = line.match(emailRe); if(m){ email = m[0]; used.add(i); } }
+  });
+  rawLines.forEach((line, i) => {
+    if(!phone && !used.has(i)){ const m = line.match(phoneRe); if(m && m[0].replace(/\D/g,"").length >= 7){ phone = m[0].trim(); used.add(i); } }
+  });
+  rawLines.forEach((line, i) => {
+    if(!org && !used.has(i) && orgRe.test(line)){ org = line; used.add(i); }
+  });
+  rawLines.forEach((line, i) => {
+    if(!name && !used.has(i) && namePatternRe.test(line)){ name = line; used.add(i); }
+  });
+  if(!name){
+    const fallback = rawLines.find((l, i) => !used.has(i));
+    if(fallback){ name = fallback; used.add(rawLines.indexOf(fallback)); }
+  }
+  if(!org){
+    const fallback = rawLines.find((l, i) => !used.has(i));
+    if(fallback){ org = fallback; used.add(rawLines.indexOf(fallback)); }
+  }
+  const leftover = rawLines.filter((l, i) => !used.has(i));
+  return { name, org, phone, email, leftover: leftover.join("\n") };
+}
+
+async function runOCRAndFill(file){
+  if(typeof Tesseract === "undefined"){
+    showToast("OCR library still loading — you can fill details in manually");
+    return;
+  }
+  $("ocrStatus").classList.remove("hidden");
+  try{
+    const { data } = await Tesseract.recognize(file, "eng");
+    const parsed = parseCardText(data.text || "");
+    if(!$("fName").value && parsed.name) $("fName").value = parsed.name;
+    if(!$("fOrg").value && parsed.org) $("fOrg").value = parsed.org;
+    if(!$("fPhone").value && parsed.phone) $("fPhone").value = parsed.phone;
+    if(!$("fEmail").value && parsed.email) $("fEmail").value = parsed.email;
+    if(parsed.leftover && !$("fNotes").value){
+      $("fNotes").value = "Detected on card:\n" + parsed.leftover;
+    }
+    showToast("Filled in what we could read — please check before saving");
+  }catch(err){
+    console.error(err);
+    showToast("Couldn't read the card text — fill in manually");
+  }finally{
+    $("ocrStatus").classList.add("hidden");
+  }
+}
+
+$("scanBtn").addEventListener("click", () => { resetEditForm(); $("cameraInput").click(); });
+$("addBtn").addEventListener("click", () => { resetEditForm(); openSheet("editSheet"); });
+
+$("cameraInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  const { thumb, image } = await processImageFile(file);
+  pendingPhoto = { thumb, image };
+  $("editPhotoPreview").src = image;
+  $("editPhotoPreview").classList.remove("hidden");
+  openSheet("editSheet");
+  runOCRAndFill(file);
+});
+
+$("editRetakeBtn").addEventListener("click", () => $("cameraInput").click());
+$("editClose").addEventListener("click", closeSheets);
+
+$("saveBtn").addEventListener("click", async () => {
+  const name = $("fName").value.trim();
+  if(!name){ showToast("Add a name before saving"); return; }
+  const now = new Date().toISOString();
+  const contact = {
+    id: uid(),
+    name,
+    org: $("fOrg").value.trim(),
+    project: $("fProject").value.trim(),
+    phone: $("fPhone").value.trim(),
+    email: $("fEmail").value.trim(),
+    notes: $("fNotes").value.trim(),
+    thumb: pendingPhoto.thumb,
+    image: pendingPhoto.image,
+    history: [{ type: $("fType").value, date: $("fDate").value || todayStr() }],
+    createdAt: now,
+    updatedAt: now
+  };
+  await put("contacts", contact);
+  contacts.push(contact);
+  renderList();
+  closeSheets();
+  showToast("Contact saved");
+});
+
+/* ============ Detail view ============ */
+function openDetail(id){
+  const c = contacts.find(x => x.id === id);
+  if(!c) return;
+  activeId = id;
+  $("detailName").textContent = c.name || "Unnamed";
+  $("dName").value = c.name || "";
+  $("dOrg").value = c.org || "";
+  $("dProject").value = c.project || "";
+  $("dPhone").value = c.phone || "";
+  $("dEmail").value = c.email || "";
+  $("dNotes").value = c.notes || "";
+  $("dLogDate").value = todayStr();
+  if(c.image){ $("detailPhoto").src = c.image; $("detailPhoto").classList.remove("hidden"); }
+  else { $("detailPhoto").classList.add("hidden"); }
+  renderHistory(c);
+  openSheet("detailSheet");
+}
+
+function renderHistory(c){
+  const items = (c.history||[]).slice().sort((a,b)=> a.date < b.date ? 1 : -1);
+  $("dHistory").innerHTML = items.map(h => `
+    <div class="history-item">
+      <div>
+        <span class="h-type">${escapeHtml(h.type)}</span>
+        ${h.note ? `<span class="h-note">${escapeHtml(h.note)}</span>` : ""}
+      </div>
+      <div class="h-date">${fmtDate(h.date)}</div>
+    </div>`).join("") || `<div class="settings-note">No interactions logged yet.</div>`;
+}
+
+$("listWrap").addEventListener("click", (e) => {
+  const row = e.target.closest(".row");
+  if(row) openDetail(row.dataset.id);
+});
+$("detailClose").addEventListener("click", closeSheets);
+
+$("dSaveBtn").addEventListener("click", async () => {
+  const c = contacts.find(x => x.id === activeId);
+  if(!c) return;
+  c.name = $("dName").value.trim() || c.name;
+  c.org = $("dOrg").value.trim();
+  c.project = $("dProject").value.trim();
+  c.phone = $("dPhone").value.trim();
+  c.email = $("dEmail").value.trim();
+  c.notes = $("dNotes").value.trim();
+  c.updatedAt = new Date().toISOString();
+  await put("contacts", c);
+  $("detailName").textContent = c.name;
+  renderList();
+  showToast("Changes saved");
+});
+
+$("dLogAdd").addEventListener("click", async () => {
+  const c = contacts.find(x => x.id === activeId);
+  if(!c) return;
+  c.history = c.history || [];
+  c.history.push({ type: $("dLogType").value, date: $("dLogDate").value || todayStr() });
+  c.updatedAt = new Date().toISOString();
+  await put("contacts", c);
+  renderHistory(c);
+  renderList();
+  showToast("Interaction logged");
+});
+
+$("dRetakeBtn").addEventListener("click", () => $("retakeInput").click());
+$("retakeInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if(!file || !activeId) return;
+  const { thumb, image } = await processImageFile(file);
+  const c = contacts.find(x => x.id === activeId);
+  c.thumb = thumb; c.image = image; c.updatedAt = new Date().toISOString();
+  await put("contacts", c);
+  $("detailPhoto").src = image;
+  $("detailPhoto").classList.remove("hidden");
+  renderList();
+  showToast("Photo updated");
+});
+
+$("dDeleteBtn").addEventListener("click", async () => {
+  if(!activeId) return;
+  if(!confirm("Delete this contact? This can't be undone.")) return;
+  await del("contacts", activeId);
+  contacts = contacts.filter(c => c.id !== activeId);
+  renderList();
+  closeSheets();
+  showToast("Contact deleted");
+});
+
+/* ============ Search ============ */
+$("searchInput").addEventListener("input", renderList);
+
+/* ============ Settings / backup / restore ============ */
+$("settingsBtn").addEventListener("click", async () => {
+  $("clientIdInput").value = await getSetting("driveClientId", "");
+  const token = await getSetting("driveToken", null);
+  $("storageStatus").textContent = token ? "Synced with Google Drive" : "Stored on this device only";
+  $("storageStatus").className = "status-pill" + (token ? "" : "");
+  if(location.protocol === "file:") $("fileProtocolWarn").classList.remove("hidden");
+  const last = await getSetting("lastSync", null);
+  if(last){
+    $("lastSyncNote").textContent = "Last synced: " + new Date(last).toLocaleString();
+    $("lastSyncNote").classList.remove("hidden");
+  }
+  openSheet("settingsSheet");
+});
+$("settingsClose").addEventListener("click", closeSheets);
+
+$("backupBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), contacts }, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `card-ledger-backup-${todayStr()}.json`;
+  a.click();
+  showToast("Backup downloaded");
+});
+
+$("restoreBtn").addEventListener("click", () => $("restoreInput").click());
+$("restoreInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  try{
+    const data = JSON.parse(await file.text());
+    const incoming = Array.isArray(data.contacts) ? data.contacts : data;
+    if(!Array.isArray(incoming)) throw new Error("bad format");
+    let added = 0;
+    for(const c of incoming){
+      if(!c.id) c.id = uid();
+      const existing = contacts.find(x => x.id === c.id);
+      if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
+        await put("contacts", c);
+        contacts = contacts.filter(x => x.id !== c.id);
+        contacts.push(c);
+        added++;
+      }
+    }
+    renderList();
+    showToast(`Restored ${added} contact(s)`);
+  }catch(err){
+    showToast("Couldn't read that backup file");
+  }
+});
+
+/* ============ Google Drive sync ============ */
+const DRIVE_FILE_NAME = "card-ledger-backup.json";
+let tokenClient = null;
+let accessToken = null;
+
+async function ensureTokenClient(){
+  const clientId = $("clientIdInput").value.trim();
+  if(!clientId){ showToast("Paste your Google Client ID first"); return null; }
+  await setSetting("driveClientId", clientId);
+  if(typeof google === "undefined" || !google.accounts){
+    showToast("Google sign-in script hasn't loaded — check your connection");
+    return null;
+  }
+  if(!tokenClient || tokenClient._clientId !== clientId){
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: "https://www.googleapis.com/auth/drive.file",
+      callback: () => {}
+    });
+    tokenClient._clientId = clientId;
+  }
+  return tokenClient;
+}
+
+function requestToken(client){
+  return new Promise((resolve, reject) => {
+    client.callback = (resp) => {
+      if(resp.error) reject(resp);
+      else resolve(resp.access_token);
+    };
+    client.requestAccessToken({ prompt: accessToken ? "" : "consent" });
+  });
+}
+
+async function driveFindFile(token){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE_NAME}'+and+trashed=false&spaces=drive&fields=files(id,name,modifiedTime)`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  return (data.files && data.files[0]) || null;
+}
+
+async function driveDownload(token, fileId){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.json();
+}
+
+async function driveUpload(token, fileId, payload){
+  const body = JSON.stringify(payload);
+  const metadata = { name: DRIVE_FILE_NAME, mimeType: "application/json" };
+  const boundary = "cardledgerboundary";
+  const multipartBody =
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(fileId ? {} : metadata)}\r\n` +
+    `--${boundary}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${boundary}--`;
+  const url = fileId
+    ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
+    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+  const res = await fetch(url, {
+    method: fileId ? "PATCH" : "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": `multipart/related; boundary=${boundary}` },
+    body: multipartBody
+  });
+  return res.json();
+}
+
+async function syncWithDrive(){
+  const client = await ensureTokenClient();
+  if(!client) return;
+  try{
+    showToast("Connecting to Google Drive…");
+    accessToken = await requestToken(client);
+    await setSetting("driveToken", true);
+
+    const existing = await driveFindFile(accessToken);
+    let merged = contacts.slice();
+
+    if(existing){
+      const remote = await driveDownload(accessToken, existing.id);
+      const remoteContacts = Array.isArray(remote.contacts) ? remote.contacts : [];
+      const byId = {};
+      merged.forEach(c => byId[c.id] = c);
+      remoteContacts.forEach(rc => {
+        const local = byId[rc.id];
+        if(!local || new Date(rc.updatedAt||0) > new Date(local.updatedAt||0)){
+          byId[rc.id] = rc;
+        }
+      });
+      merged = Object.values(byId);
+      for(const c of merged) await put("contacts", c);
+      contacts = merged;
+    }
+
+    await driveUpload(accessToken, existing ? existing.id : null, { exportedAt: new Date().toISOString(), contacts: merged });
+    await setSetting("lastSync", new Date().toISOString());
+    renderList();
+    showToast("Synced with Google Drive");
+  }catch(err){
+    console.error(err);
+    showToast("Drive sync failed — check the Client ID and origin setup");
+  }
+}
+
+$("connectDriveBtn").addEventListener("click", syncWithDrive);
+$("syncBtn").addEventListener("click", syncWithDrive);
+$("disconnectDriveBtn").addEventListener("click", async () => {
+  accessToken = null;
+  await setSetting("driveToken", null);
+  showToast("Disconnected from Drive");
+  $("storageStatus").textContent = "Stored on this device only";
+});
+
+/* ============ Boot ============ */
+(async function init(){
+  contacts = await getAll("contacts");
+  renderList();
+  const clientId = await getSetting("driveClientId", "");
+  if(clientId) $("clientIdInput").value = clientId;
+})();
+
+})();
+</script>
+</body>
+</html>
