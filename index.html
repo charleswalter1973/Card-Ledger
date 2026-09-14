@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root{
     --ink:#16213E;
@@ -425,6 +426,7 @@
   </div>
   <div class="sheet-body">
     <img id="editPhotoPreview" class="card-photo hidden">
+    <div id="ocrStatus" class="status-pill hidden">Reading text from the card…</div>
     <button class="btn outline block" id="editRetakeBtn" style="margin-bottom:16px;">Add / retake card photo</button>
 
     <div class="field">
@@ -708,7 +710,68 @@ function resetEditForm(){
   $("fDate").value = todayStr();
   pendingPhoto = { thumb:null, image:null };
   $("editPhotoPreview").classList.add("hidden");
+  $("ocrStatus").classList.add("hidden");
   $("editTitle").textContent = "New contact";
+}
+
+/* ============ OCR (on-device, via Tesseract.js) ============ */
+function parseCardText(text){
+  const rawLines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const emailRe = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+  const phoneRe = /(\+?\d[\d\s().-]{6,}\d)/;
+  const orgRe = /\b(inc|ltd|llc|corp|co\.?|company|group|industries|solutions|enterprises|pvt|limited|technologies|systems|associates|partners|studio)\b/i;
+  const namePatternRe = /^[A-Z][a-zA-Z.'-]+(\s+[A-Z][a-zA-Z.'-]+){1,3}$/;
+
+  let email = "", phone = "", org = "", name = "";
+  const used = new Set();
+
+  rawLines.forEach((line, i) => {
+    if(!email){ const m = line.match(emailRe); if(m){ email = m[0]; used.add(i); } }
+  });
+  rawLines.forEach((line, i) => {
+    if(!phone && !used.has(i)){ const m = line.match(phoneRe); if(m && m[0].replace(/\D/g,"").length >= 7){ phone = m[0].trim(); used.add(i); } }
+  });
+  rawLines.forEach((line, i) => {
+    if(!org && !used.has(i) && orgRe.test(line)){ org = line; used.add(i); }
+  });
+  rawLines.forEach((line, i) => {
+    if(!name && !used.has(i) && namePatternRe.test(line)){ name = line; used.add(i); }
+  });
+  if(!name){
+    const fallback = rawLines.find((l, i) => !used.has(i));
+    if(fallback){ name = fallback; used.add(rawLines.indexOf(fallback)); }
+  }
+  if(!org){
+    const fallback = rawLines.find((l, i) => !used.has(i));
+    if(fallback){ org = fallback; used.add(rawLines.indexOf(fallback)); }
+  }
+  const leftover = rawLines.filter((l, i) => !used.has(i));
+  return { name, org, phone, email, leftover: leftover.join("\n") };
+}
+
+async function runOCRAndFill(file){
+  if(typeof Tesseract === "undefined"){
+    showToast("OCR library still loading — you can fill details in manually");
+    return;
+  }
+  $("ocrStatus").classList.remove("hidden");
+  try{
+    const { data } = await Tesseract.recognize(file, "eng");
+    const parsed = parseCardText(data.text || "");
+    if(!$("fName").value && parsed.name) $("fName").value = parsed.name;
+    if(!$("fOrg").value && parsed.org) $("fOrg").value = parsed.org;
+    if(!$("fPhone").value && parsed.phone) $("fPhone").value = parsed.phone;
+    if(!$("fEmail").value && parsed.email) $("fEmail").value = parsed.email;
+    if(parsed.leftover && !$("fNotes").value){
+      $("fNotes").value = "Detected on card:\n" + parsed.leftover;
+    }
+    showToast("Filled in what we could read — please check before saving");
+  }catch(err){
+    console.error(err);
+    showToast("Couldn't read the card text — fill in manually");
+  }finally{
+    $("ocrStatus").classList.add("hidden");
+  }
 }
 
 $("scanBtn").addEventListener("click", () => { resetEditForm(); $("cameraInput").click(); });
@@ -723,6 +786,7 @@ $("cameraInput").addEventListener("change", async (e) => {
   $("editPhotoPreview").src = image;
   $("editPhotoPreview").classList.remove("hidden");
   openSheet("editSheet");
+  runOCRAndFill(file);
 });
 
 $("editRetakeBtn").addEventListener("click", () => $("cameraInput").click());
