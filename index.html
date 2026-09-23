@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architects & Designers CRM</title>
+    <title>Card Ledger CRM</title>
     <!-- Tesseract.js for Business Card OCR Scanning -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
@@ -213,7 +213,7 @@
         <button onclick="dismissAlarmBanner()">Dismiss</button>
     </div>
 
-    <h2>Architects & Designers</h2>
+    <h2>Card Ledger</h2>
 
     <!-- Potential Metrics -->
     <div class="metrics-grid">
@@ -248,7 +248,7 @@
     <!-- Add Contact / OCR Scan Modal -->
     <div id="addModal" class="modal">
         <div class="modal-content">
-            <h3 id="addModalTitle">Add Architect / Designer</h3>
+            <h3 id="addModalTitle">Add Card Contact</h3>
             <div class="form-group" style="background:#eef7ff; padding:10px; border-radius:8px;">
                 <label>📷 Take Photo / Upload Visiting Card</label>
                 <input type="file" id="cardScanner" accept="image/*" capture="environment" onchange="scanCard(event)">
@@ -513,7 +513,7 @@
             document.getElementById('architectForm').reset();
             document.getElementById('cardImgData').value = '';
             document.getElementById('ocrStatus').innerText = '';
-            document.getElementById('addModalTitle').innerText = 'Add Architect / Designer';
+            document.getElementById('addModalTitle').innerText = 'Add Card Contact';
             document.getElementById('reminderFieldset').style.display = 'block';
             document.getElementById('deleteContactBtn').style.display = 'none';
             openModal('addModal');
@@ -533,7 +533,7 @@
             document.getElementById('notes').value = c.notes || '';
             document.getElementById('cardImgData').value = c.cardImg || '';
             document.getElementById('ocrStatus').innerText = '';
-            document.getElementById('addModalTitle').innerText = 'Edit Architect / Designer';
+            document.getElementById('addModalTitle').innerText = 'Edit Card Contact';
             document.getElementById('reminderFieldset').style.display = 'none';
             document.getElementById('deleteContactBtn').style.display = 'block';
             openModal('addModal');
@@ -599,7 +599,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(contacts, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `architects_backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.setAttribute("download", `card_ledger_backup_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
