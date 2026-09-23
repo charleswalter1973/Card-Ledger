@@ -1,1331 +1,760 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Card Ledger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<style>
-  :root{
-    --ink:#16213E;
-    --ink-soft:#5B6472;
-    --paper:#EEF0F2;
-    --surface:#FFFFFF;
-    --brass:#A9762F;
-    --brass-dark:#8C6224;
-    --pine:#2F5D50;
-    --rust:#A23E33;
-    --line:#DCDFE4;
-    --shadow: 0 1px 0 rgba(22,33,62,0.04);
-    --radius: 10px;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:'Inter',sans-serif;
-    background:var(--paper);
-    color:var(--ink);
-    min-height:100vh;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .app{
-    max-width:560px;
-    margin:0 auto;
-    min-height:100vh;
-    background:var(--paper);
-    display:flex;
-    flex-direction:column;
-    position:relative;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architects & Designers CRM</title>
+    <!-- Tesseract.js for Business Card OCR Scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-  /* ---------- Header ---------- */
-  header.top{
-    background:var(--ink);
-    color:#fff;
-    padding:20px 18px 16px;
-    position:sticky;
-    top:0;
-    z-index:20;
-  }
-  .top-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .brand{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:1.5rem;
-    letter-spacing:0.2px;
-  }
-  .brand small{
-    display:block;
-    font-family:'Inter',sans-serif;
-    font-size:0.68rem;
-    font-weight:500;
-    color:#B9C0CE;
-    letter-spacing:0.3px;
-    margin-top:2px;
-  }
-  .icon-btn{
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.28);
-    color:#fff;
-    width:38px;height:38px;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-  }
-  .icon-btn svg{width:18px;height:18px;}
-  .icon-btn.pine{border-color:rgba(120,200,170,0.5);}
-  .search-wrap{
-    margin-top:14px;
-    position:relative;
-  }
-  .search-wrap svg{
-    position:absolute;
-    left:13px;top:50%;transform:translateY(-50%);
-    width:16px;height:16px;
-    color:var(--ink-soft);
-  }
-  .search-wrap input{
-    width:100%;
-    background:#fff;
-    border:none;
-    border-radius:8px;
-    padding:11px 12px 11px 36px;
-    font-size:0.92rem;
-    font-family:'Inter',sans-serif;
-    color:var(--ink);
-  }
-  .search-wrap input:focus{outline:2px solid var(--brass);outline-offset:1px;}
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --high: #28a745;
+            --warm: #fd7e14;
+            --occ: #6c757d;
+            --text: #333333;
+        }
 
-  .col-labels{
-    display:flex;
-    padding:12px 18px 8px;
-    font-size:0.72rem;
-    color:var(--ink-soft);
-    font-weight:600;
-    border-bottom:1px solid var(--line);
-  }
-  .col-labels .c1{width:50px;flex-shrink:0;}
-  .col-labels .c2{flex:1;}
-  .col-labels .c3{width:96px;flex-shrink:0;text-align:right;}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 12px;
+            padding-bottom: 80px;
+        }
 
-  /* ---------- List ---------- */
-  main{flex:1;overflow-y:auto;padding-bottom:96px;}
-  .row{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:12px 18px;
-    border-bottom:1px solid var(--line);
-    background:var(--surface);
-    cursor:pointer;
-  }
-  .row:active{background:#F5F3EE;}
-  .thumb{
-    width:50px;height:36px;
-    border-radius:3px;
-    object-fit:cover;
-    flex-shrink:0;
-    box-shadow:0 1px 3px rgba(22,33,62,0.25);
-    transform:rotate(-1.5deg);
-    border:1px solid rgba(0,0,0,0.06);
-  }
-  .thumb.placeholder{
-    display:flex;align-items:center;justify-content:center;
-    background:#E4E7EB;
-    color:var(--ink-soft);
-    transform:none;
-  }
-  .thumb.placeholder svg{width:16px;height:16px;}
-  .row-main{flex:1;min-width:0;}
-  .row-name{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:1.02rem;
-    line-height:1.2;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .row-org{
-    font-size:0.82rem;
-    color:var(--ink-soft);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    margin-top:2px;
-  }
-  .row-project{
-    font-size:0.78rem;
-    color:var(--brass-dark);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    margin-top:1px;
-  }
-  .row-last{
-    width:96px;flex-shrink:0;text-align:right;
-  }
-  .row-last .type{
-    font-size:0.72rem;
-    color:var(--brass-dark);
-    font-weight:600;
-  }
-  .row-last .date{
-    font-size:0.82rem;
-    font-weight:700;
-    color:var(--ink);
-    margin-top:1px;
-  }
-  .row-reminder{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:3px;
-    font-size:0.7rem;
-    font-weight:600;
-    margin-top:4px;
-    color:var(--brass-dark);
-  }
-  .row-reminder svg{width:11px;height:11px;flex-shrink:0;}
-  .row-reminder.due{color:var(--rust);}
+        h2 { margin-top: 5px; margin-bottom: 12px; font-size: 22px; color: #444; }
 
-  /* ---------- Alarm banner ---------- */
-  .alarm-banner{
-    position:fixed;
-    top:0;left:0;right:0;
-    max-width:560px;
-    margin:0 auto;
-    background:var(--rust);
-    color:#fff;
-    z-index:60;
-    padding:14px 18px;
-    display:none;
-    box-shadow:0 4px 14px rgba(0,0,0,0.25);
-  }
-  .alarm-banner.show{display:block;}
-  .alarm-banner .ab-title{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:1.02rem;
-    display:flex;align-items:center;gap:8px;
-    margin-bottom:4px;
-  }
-  .alarm-banner .ab-item{
-    font-size:0.85rem;
-    padding:6px 0;
-    border-top:1px solid rgba(255,255,255,0.25);
-  }
-  .alarm-banner .ab-item b{display:block;}
-  .alarm-banner button{
-    margin-top:10px;
-    background:#fff;
-    color:var(--rust);
-    border:none;
-    border-radius:7px;
-    padding:9px 14px;
-    font-weight:600;
-    font-size:0.85rem;
-    cursor:pointer;
-  }
+        /* Potential Header Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .metric-card {
+            background: var(--card-bg);
+            padding: 10px 6px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-bottom: 4px solid var(--occ);
+        }
+        .metric-card.high { border-color: var(--high); }
+        .metric-card.warm { border-color: var(--warm); }
+        .metric-card.occ { border-color: var(--occ); }
+        .metric-title { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #666; }
+        .metric-val { font-size: 18px; font-weight: bold; margin-top: 4px; }
 
-  .empty-state{
-    padding:60px 32px;
-    text-align:center;
-    color:var(--ink-soft);
-  }
-  .empty-state h2{
-    font-family:'Fraunces',serif;
-    color:var(--ink);
-    font-weight:600;
-    margin-bottom:6px;
-  }
-  .empty-state p{font-size:0.9rem;line-height:1.5;}
+        /* Search & Filter Tabs */
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
 
-  /* ---------- Bottom action bar ---------- */
-  .action-bar{
-    position:fixed;
-    bottom:0;left:0;right:0;
-    max-width:560px;
-    margin:0 auto;
-    display:flex;
-    gap:10px;
-    padding:12px 18px calc(12px + env(safe-area-inset-bottom));
-    background:linear-gradient(to top, var(--paper) 70%, rgba(238,240,242,0));
-    z-index:15;
-  }
-  .btn{
-    flex:1;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    padding:13px 14px;
-    border-radius:8px;
-    font-family:'Inter',sans-serif;
-    font-weight:600;
-    font-size:0.9rem;
-    border:none;
-    cursor:pointer;
-  }
-  .btn svg{width:17px;height:17px;}
-  .btn.primary{background:var(--brass);color:#fff;}
-  .btn.primary:active{background:var(--brass-dark);}
-  .btn.outline{background:#fff;color:var(--ink);border:1.5px solid var(--ink);}
-  .btn.outline:active{background:#EDEEF0;}
-  .btn.pine{background:var(--pine);color:#fff;}
-  .btn.rust{background:transparent;color:var(--rust);border:1.5px solid var(--rust);}
-  .btn.block{width:100%;}
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #495057;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .tab-btn.tab-all { background: #28a745; color: #fff; }
+        .tab-btn.tab-high { background: #d4edda; color: #155724; }
+        .tab-btn.tab-warm { background: #cfe2f3; color: #0b4f7a; }
+        .tab-btn.tab-occ { background: #ffe8cc; color: #7a4a00; }
+        .tab-btn.active {
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.3) inset;
+        }
 
-  /* ---------- Sheets / modals ---------- */
-  .sheet-backdrop{
-    position:fixed;inset:0;
-    background:rgba(22,33,62,0.45);
-    z-index:30;
-    display:none;
-  }
-  .sheet-backdrop.open{display:block;}
-  .sheet{
-    position:fixed;
-    left:0;right:0;bottom:0;
-    max-width:560px;
-    margin:0 auto;
-    background:var(--paper);
-    border-radius:16px 16px 0 0;
-    max-height:92vh;
-    display:flex;flex-direction:column;
-    transform:translateY(100%);
-    transition:transform 0.28s ease;
-    z-index:31;
-  }
-  .sheet.open{transform:translateY(0);}
-  .sheet-handle{
-    width:36px;height:4px;
-    background:var(--line);
-    border-radius:2px;
-    margin:10px auto 4px;
-  }
-  .sheet-head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:6px 18px 10px;
-    border-bottom:1px solid var(--line);
-  }
-  .sheet-title{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:1.15rem;
-  }
-  .sheet-body{
-    padding:16px 18px 28px;
-    overflow-y:auto;
-  }
-  .card-photo{
-    width:100%;
-    max-height:220px;
-    object-fit:contain;
-    background:#1B2A46;
-    border-radius:10px;
-    margin-bottom:16px;
-  }
-  .field{margin-bottom:14px;}
-  .field label{
-    display:block;
-    font-size:0.72rem;
-    font-weight:600;
-    color:var(--ink-soft);
-    margin-bottom:5px;
-  }
-  .field input, .field select, .field textarea{
-    width:100%;
-    padding:10px 11px;
-    border:1.5px solid var(--line);
-    border-radius:7px;
-    font-family:'Inter',sans-serif;
-    font-size:0.92rem;
-    color:var(--ink);
-    background:#fff;
-  }
-  .field textarea{resize:vertical;min-height:60px;}
-  .field-row{display:flex;gap:10px;}
-  .field-row .field{flex:1;}
+        /* Lead Card Styling */
+        .lead-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .card-top {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .card-thumb {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #eee;
+            flex-shrink: 0;
+        }
+        .card-details { flex-grow: 1; }
+        .card-title { font-size: 16px; font-weight: bold; margin: 0 0 4px 0; }
+        .card-sub { font-size: 12px; color: #666; margin-bottom: 6px; }
+        .card-notes { font-size: 12px; color: #444; margin-bottom: 6px; }
+        .card-date { font-size: 10px; color: #888; }
+        .card-reminder {
+            font-size: 11px;
+            font-weight: bold;
+            color: #fd7e14;
+            margin-top: 4px;
+        }
+        .card-reminder.due { color: #dc3545; }
 
-  .history-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    padding:9px 0;
-    border-bottom:1px solid var(--line);
-  }
-  .history-item:last-child{border-bottom:none;}
-  .history-item .h-type{font-weight:600;font-size:0.88rem;}
-  .history-item .h-note{color:var(--ink-soft);font-size:0.78rem;display:block;}
-  .history-item .h-date{font-size:0.82rem;color:var(--ink-soft);white-space:nowrap;padding-left:10px;}
+        /* Alarm banner */
+        #alarmBanner {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: #dc3545;
+            color: #fff;
+            padding: 14px;
+            z-index: 2000;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        #alarmBannerText { font-size: 13px; font-weight: bold; margin-bottom: 8px; }
+        #alarmBanner button {
+            background: #fff; color: #dc3545; border: none;
+            padding: 6px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
 
-  .section-label{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:0.98rem;
-    margin:18px 0 8px;
-  }
-  .log-form{
-    display:flex;gap:8px;margin-bottom:10px;
-  }
-  .log-form select, .log-form input{
-    padding:9px;
-    border:1.5px solid var(--line);
-    border-radius:7px;
-    font-size:0.85rem;
-  }
-  .log-form button{
-    background:var(--pine);color:#fff;border:none;border-radius:7px;
-    padding:0 14px;font-weight:600;font-size:0.85rem;cursor:pointer;
-  }
+        .card-actions {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+        .action-btn {
+            text-decoration: none;
+            font-size: 16px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: #f0f0f0;
+            text-align: center;
+            flex: 1 1 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
 
-  .settings-note{
-    background:#fff;
-    border:1.5px solid var(--line);
-    border-radius:8px;
-    padding:12px 13px;
-    font-size:0.82rem;
-    color:var(--ink-soft);
-    line-height:1.55;
-    margin-bottom:14px;
-  }
-  .settings-note b{color:var(--ink);}
-  .settings-note ol{margin:6px 0 0;padding-left:18px;}
-  .status-pill{
-    display:inline-flex;align-items:center;gap:5px;
-    font-size:0.76rem;font-weight:600;
-    padding:4px 9px;border-radius:20px;
-    background:#E4EDE9;color:var(--pine);
-    margin-bottom:12px;
-  }
-  .status-pill.warn{background:#F4E4DF;color:var(--rust);}
-  .hidden{display:none !important;}
-  .toast{
-    position:fixed;
-    bottom:100px;left:50%;transform:translateX(-50%);
-    background:var(--ink);color:#fff;
-    padding:10px 18px;border-radius:20px;
-    font-size:0.85rem;
-    z-index:50;
-    opacity:0;
-    transition:opacity 0.25s ease;
-    pointer-events:none;
-    max-width:90%;
-    text-align:center;
-  }
-  .toast.show{opacity:1;}
-</style>
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            margin: 20px auto;
+            padding: 18px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
+        }
+
+        /* Bottom Navigation Bar */
+        .navbar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+        }
+        .nav-item {
+            flex: 1;
+            border: none; background: none; font-size: 11px; color: #555; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .nav-item span { font-size: 18px; }
+    </style>
 </head>
 <body>
-<div class="app">
 
-  <header class="top">
-    <div class="top-row">
-      <div class="brand">Card Ledger<small>Every card you've collected, in one place</small></div>
-      <div style="display:flex;gap:8px;">
-        <button class="icon-btn" id="remindersBtn" title="Enable reminder alarms">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        </button>
-        <button class="icon-btn pine" id="syncBtn" title="Sync with Google Drive">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
-        </button>
-        <button class="icon-btn" id="settingsBtn" title="Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009.2 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9.2a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        </button>
-      </div>
-    </div>
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input type="text" id="searchInput" placeholder="Search name, company or project…">
-    </div>
-  </header>
-
-  <div class="col-labels">
-    <div class="c1">Card</div>
-    <div class="c2">Name / Company</div>
-    <div class="c3">Last contact</div>
-  </div>
-
-  <main id="listWrap">
-    <!-- rows injected here -->
-  </main>
-
-  <div class="action-bar">
-    <button class="btn primary" id="scanBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Scan card
-    </button>
-    <button class="btn outline" id="addBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-      Add manually
-    </button>
-  </div>
-</div>
-
-<input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
-<input type="file" accept="image/*" id="retakeInput" class="hidden">
-<input type="file" accept="application/json" id="restoreInput" class="hidden">
-
-<!-- Backdrop shared -->
-<div class="sheet-backdrop" id="backdrop"></div>
-
-<!-- Add / Edit sheet -->
-<div class="sheet" id="editSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <div class="sheet-title" id="editTitle">New contact</div>
-    <button class="icon-btn outline-none" id="editClose" style="border:none;color:var(--ink);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-  </div>
-  <div class="sheet-body">
-    <img id="editPhotoPreview" class="card-photo hidden">
-    <div id="ocrStatus" class="status-pill hidden">Reading text from the card…</div>
-    <button class="btn outline block" id="editRetakeBtn" style="margin-bottom:16px;">Add / retake card photo</button>
-
-    <div class="field">
-      <label>Name</label>
-      <input type="text" id="fName" placeholder="e.g. John Smith">
-    </div>
-    <div class="field">
-      <label>Company</label>
-      <input type="text" id="fOrg" placeholder="e.g. Tech Solutions Inc.">
-    </div>
-    <div class="field">
-      <label>Project / role (optional)</label>
-      <input type="text" id="fProject" placeholder="e.g. Warehouse automation deal">
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Phone</label>
-        <input type="tel" id="fPhone">
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="fEmail">
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>How did you get this card?</label>
-        <select id="fType">
-          <option>Met</option>
-          <option>Contacted</option>
-          <option>Called</option>
-          <option>Emailed</option>
-          <option>Visited</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="fDate">
-      </div>
-    </div>
-    <div class="field">
-      <label>Notes</label>
-      <textarea id="fNotes" placeholder="Anything worth remembering…"></textarea>
+    <div id="alarmBanner">
+        <div id="alarmBannerText"></div>
+        <button onclick="dismissAlarmBanner()">Dismiss</button>
     </div>
 
-    <div class="section-label">Reminder (optional)</div>
-    <div class="field-row">
-      <div class="field"><label>Date</label><input type="date" id="fReminderDate"></div>
-      <div class="field"><label>Time</label><input type="time" id="fReminderTime" value="09:00"></div>
-    </div>
-    <div class="field">
-      <label>Reminder note</label>
-      <input type="text" id="fReminderNote" placeholder="e.g. Follow up about the proposal">
-    </div>
+    <h2>Architects & Designers</h2>
 
-    <button class="btn primary block" id="saveBtn">Save contact</button>
-  </div>
-</div>
-
-<!-- Detail sheet -->
-<div class="sheet" id="detailSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <div class="sheet-title" id="detailName">Name</div>
-    <button class="icon-btn" id="detailClose" style="border:none;color:var(--ink);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-  </div>
-  <div class="sheet-body">
-    <img id="detailPhoto" class="card-photo hidden">
-    <div class="field">
-      <label>Name</label>
-      <input type="text" id="dName">
-    </div>
-    <div class="field">
-      <label>Company</label>
-      <input type="text" id="dOrg">
-    </div>
-    <div class="field">
-      <label>Project / role</label>
-      <input type="text" id="dProject">
-    </div>
-    <div class="field-row">
-      <div class="field"><label>Phone</label><input type="tel" id="dPhone"></div>
-      <div class="field"><label>Email</label><input type="email" id="dEmail"></div>
-    </div>
-    <div class="field">
-      <label>Notes</label>
-      <textarea id="dNotes"></textarea>
-    </div>
-    <button class="btn outline block" id="dSaveBtn">Save changes</button>
-
-    <div class="section-label">Reminder</div>
-    <div id="dReminderCurrent" class="settings-note hidden"></div>
-    <div class="field-row">
-      <div class="field"><label>Date</label><input type="date" id="dReminderDate"></div>
-      <div class="field"><label>Time</label><input type="time" id="dReminderTime" value="09:00"></div>
-    </div>
-    <div class="field">
-      <label>Reminder note</label>
-      <input type="text" id="dReminderNote" placeholder="e.g. Call back next week">
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:6px;">
-      <button class="btn pine" id="dReminderSet">Set alarm</button>
-      <button class="btn outline" id="dReminderClear">Clear reminder</button>
+    <!-- Potential Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card high">
+            <div class="metric-title">High</div>
+            <div class="metric-val" id="cnt-high">0</div>
+        </div>
+        <div class="metric-card warm">
+            <div class="metric-title">Warm</div>
+            <div class="metric-val" id="cnt-warm">0</div>
+        </div>
+        <div class="metric-card occ">
+            <div class="metric-title">Occasional</div>
+            <div class="metric-val" id="cnt-occ">0</div>
+        </div>
     </div>
 
-    <div class="section-label">Log a new interaction</div>
-    <div class="log-form">
-      <select id="dLogType">
-        <option>Contacted</option><option>Met</option><option>Called</option><option>Emailed</option><option>Visited</option>
-      </select>
-      <input type="date" id="dLogDate">
-      <button id="dLogAdd">Add</button>
+    <!-- Search Box -->
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search name, company, or project..." oninput="renderCards()">
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+        <button class="tab-btn tab-all active" onclick="setFilter('All', this)">All</button>
+        <button class="tab-btn tab-high" onclick="setFilter('High Potential', this)">High Potential</button>
+        <button class="tab-btn tab-warm" onclick="setFilter('Warm Potential', this)">Warm Potential</button>
+        <button class="tab-btn tab-occ" onclick="setFilter('Occasional', this)">Occasional</button>
     </div>
 
-    <div class="section-label">History</div>
-    <div id="dHistory"></div>
+    <!-- Directory Cards Container -->
+    <div id="cardsList"></div>
 
-    <div style="margin-top:22px;display:flex;gap:10px;">
-      <button class="btn outline" id="dRetakeBtn">Replace photo</button>
-      <button class="btn rust" id="dDeleteBtn">Delete contact</button>
+    <!-- Add Contact / OCR Scan Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3 id="addModalTitle">Add Architect / Designer</h3>
+            <div class="form-group" style="background:#eef7ff; padding:10px; border-radius:8px;">
+                <label>📷 Take Photo / Upload Visiting Card</label>
+                <input type="file" id="cardScanner" accept="image/*" capture="environment" onchange="scanCard(event)">
+                <small id="ocrStatus" style="color: #0066cc; font-weight:bold; display:block; margin-top:4px;"></small>
+            </div>
+            <form id="architectForm" onsubmit="saveArchitect(event)">
+                <div class="form-group">
+                    <label>Client Name*</label>
+                    <input type="text" id="clientName" placeholder="Auto-filled or type manually" required>
+                </div>
+                <div class="form-group">
+                    <label>Firm / Company Name</label>
+                    <input type="text" id="firmName" placeholder="e.g. Studio XYZ Architects">
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" id="city" value="Mumbai">
+                </div>
+                <div class="form-group">
+                    <label>Specialization / Project Type</label>
+                    <select id="specialization">
+                        <option>Luxury Villa Project</option>
+                        <option>Showroom Design</option>
+                        <option>Apartment Renovation</option>
+                        <option>Commercial Architecture</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" placeholder="Auto-filled or type manually">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="Auto-filled or type manually">
+                </div>
+                <div class="form-group">
+                    <label>Potential Level</label>
+                    <select id="potential">
+                        <option>High Potential</option>
+                        <option selected>Warm Potential</option>
+                        <option>Occasional</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Follow-up Notes</label>
+                    <textarea id="notes" rows="2" placeholder="Enter notes..."></textarea>
+                </div>
+                <div class="form-group" id="reminderFieldset" style="background:#fff6ea; padding:10px; border-radius:8px;">
+                    <label>⏰ Reminder (optional)</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="date" id="newRemDate" style="flex:1;">
+                        <input type="time" id="newRemTime" value="09:00" style="flex:1;">
+                    </div>
+                    <input type="text" id="newRemNote" placeholder="e.g. Follow up about the quote" style="margin-top:6px;">
+                </div>
+                <input type="hidden" id="cardImgData">
+                <button type="submit" style="width:100%; padding:10px; background:#28a745; color:#fff; border:none; border-radius:6px; font-weight:bold;">Save Contact</button>
+                <button type="button" id="deleteContactBtn" onclick="deleteFromModal()" style="display:none; width:100%; padding:10px; margin-top:6px; background:#dc3545; color:#fff; border:none; border-radius:6px; font-weight:bold;">🗑️ Delete Contact</button>
+                <button type="button" onclick="closeModal('addModal')" style="width:100%; padding:8px; margin-top:6px; background:#ccc; border:none; border-radius:6px;">Cancel</button>
+            </form>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- Settings sheet -->
-<div class="sheet" id="settingsSheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <div class="sheet-title">Settings & sync</div>
-    <button class="icon-btn" id="settingsClose" style="border:none;color:var(--ink);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-  </div>
-  <div class="sheet-body">
-    <div id="storageStatus" class="status-pill">Stored on this device only</div>
-
-    <div class="section-label">Local backup</div>
-    <div class="settings-note">Everything is saved on this device automatically (photos included). Use these buttons any time to make a portable copy, or move that copy into your own Google Drive folder manually.</div>
-    <div style="display:flex;gap:10px;margin-bottom:22px;">
-      <button class="btn outline" id="backupBtn">Download backup</button>
-      <button class="btn outline" id="restoreBtn">Restore backup</button>
+    <!-- Reminder Modal -->
+    <div id="reminderModal" class="modal">
+        <div class="modal-content">
+            <h3>⏰ Set Reminder</h3>
+            <p id="reminderForName" style="font-size:13px; color:#666;"></p>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="remDate">
+            </div>
+            <div class="form-group">
+                <label>Time</label>
+                <input type="time" id="remTime" value="09:00">
+            </div>
+            <div class="form-group">
+                <label>Note</label>
+                <input type="text" id="remNote" placeholder="e.g. Follow up about the quote">
+            </div>
+            <button type="button" onclick="saveReminder()" style="width:100%; padding:10px; background:#28a745; color:#fff; border:none; border-radius:6px; font-weight:bold;">Save Reminder</button>
+            <button type="button" onclick="clearReminder()" style="width:100%; padding:8px; margin-top:6px; background:#dc3545; color:#fff; border:none; border-radius:6px;">Clear Reminder</button>
+            <button type="button" onclick="closeModal('reminderModal')" style="width:100%; padding:8px; margin-top:6px; background:#ccc; border:none; border-radius:6px;">Close</button>
+        </div>
     </div>
 
-    <div class="section-label">Google Drive sync (optional)</div>
-    <div class="settings-note" id="driveNote">
-      This connects directly to <b>your</b> Google Drive using Google's own sign-in — no data passes through any other server.
-      <ol>
-        <li>In <b>Google Cloud Console</b>, create a project and an OAuth Client ID (type: Web application).</li>
-        <li>Add the exact address this page is hosted at to <b>Authorized JavaScript origins</b>.</li>
-        <li>Paste that Client ID below and tap Connect.</li>
-      </ol>
-      <span id="fileProtocolWarn" class="hidden" style="color:var(--rust);display:block;margin-top:8px;">
-        <b>This copy is open as a local file</b>, and Google does not allow sign-in from local files. Host this page (for example on GitHub Pages) and open it from that address to use Drive sync.
-      </span>
+    <!-- Settings & Database Backup/Restore Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Settings & Backup</h3>
+            <p style="font-size: 12px; color: #666;">Manage your database backups and restore saved JSON files to/from Google Drive.</p>
+
+            <div class="form-group" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px;">
+                <label>🔔 Reminder Alarms</label>
+                <button onclick="requestNotifyPermission(true)" style="width:100%; padding:10px; background:#fd7e14; color:#fff; border:none; border-radius:6px; font-weight:bold;">Enable Alarm Notifications</button>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px;">
+                <label>☁️ Export Backup File</label>
+                <button onclick="backupToDrive()" style="width:100%; padding:10px; background:#007bff; color:#fff; border:none; border-radius:6px; font-weight:bold;">Download JSON Backup</button>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px;">
+                <label>📥 Restore Backup (.json file)</label>
+                <input type="file" id="jsonImporter" accept=".json" onchange="restoreFromDrive(event)">
+            </div>
+
+            <button type="button" onclick="closeModal('settingsModal')" style="width:100%; padding:8px; margin-top:15px; background:#ccc; border:none; border-radius:6px;">Close</button>
+        </div>
     </div>
-    <div class="field">
-      <label>Google OAuth Client ID</label>
-      <input type="text" id="clientIdInput" placeholder="xxxxx.apps.googleusercontent.com">
+
+    <!-- Bottom Navigation Bar -->
+    <div class="navbar">
+        <button class="nav-item" onclick="renderCards()"><span>👥</span>Clients</button>
+        <button class="nav-item" onclick="openAddModal()"><span>➕</span>Add / Scan</button>
+        <button class="nav-item" onclick="openModal('settingsModal')"><span>⚙️</span>Settings</button>
     </div>
-    <button class="btn pine block" id="connectDriveBtn" style="margin-bottom:10px;">Connect & sync now</button>
-    <button class="btn outline block" id="disconnectDriveBtn">Disconnect Drive</button>
-    <div id="lastSyncNote" class="settings-note hidden" style="margin-top:14px;"></div>
-  </div>
-</div>
 
-<div class="alarm-banner" id="alarmBanner">
-  <div class="ab-title">
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-    Reminder alarm
-  </div>
-  <div id="alarmBannerItems"></div>
-  <button id="alarmBannerDismiss">Dismiss</button>
-</div>
+    <script>
+        let contacts = JSON.parse(localStorage.getItem('architect_contacts') || '[]');
+        let currentFilter = 'All';
+        let editingId = null;
 
-<div class="toast" id="toast"></div>
-
-<script>
-(function(){
-"use strict";
-
-/* ============ IndexedDB layer ============ */
-const DB_NAME = "cardLedgerDB", DB_VERSION = 1;
-let dbPromise = new Promise((resolve, reject) => {
-  const req = indexedDB.open(DB_NAME, DB_VERSION);
-  req.onupgradeneeded = (e) => {
-    const db = e.target.result;
-    if(!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", {keyPath:"id"});
-    if(!db.objectStoreNames.contains("settings")) db.createObjectStore("settings", {keyPath:"key"});
-  };
-  req.onsuccess = (e) => resolve(e.target.result);
-  req.onerror = (e) => reject(e.target.error);
-});
-
-function tx(store, mode){ return dbPromise.then(db => db.transaction(store, mode).objectStore(store)); }
-function getAll(store){ return tx(store,"readonly").then(s => new Promise((res,rej)=>{ const r=s.getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })); }
-function put(store, val){ return tx(store,"readwrite").then(s => new Promise((res,rej)=>{ const r=s.put(val); r.onsuccess=()=>res(val); r.onerror=()=>rej(r.error); })); }
-function del(store, key){ return tx(store,"readwrite").then(s => new Promise((res,rej)=>{ const r=s.delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); })); }
-function getOne(store, key){ return tx(store,"readonly").then(s => new Promise((res,rej)=>{ const r=s.get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })); }
-
-function getSetting(key, fallback){ return getOne("settings", key).then(r => r ? r.value : fallback); }
-function setSetting(key, value){ return put("settings", {key, value}); }
-
-/* ============ State ============ */
-let contacts = [];
-let activeId = null;
-let pendingPhoto = { thumb:null, image:null };
-
-const $ = (id) => document.getElementById(id);
-const todayStr = () => new Date().toISOString().slice(0,10);
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-
-function showToast(msg){
-  const t = $("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(t._h);
-  t._h = setTimeout(()=>t.classList.remove("show"), 2200);
-}
-
-function lastEntry(c){
-  if(!c.history || !c.history.length) return null;
-  return c.history.slice().sort((a,b)=> a.date < b.date ? 1 : -1)[0];
-}
-
-function sortContactsByName(){
-  contacts.sort((a,b)=> (a.name||"").localeCompare(b.name||"", undefined, {sensitivity:"base", numeric:true}));
-}
-
-function fmtDate(iso){
-  if(!iso) return "—";
-  const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString(undefined, {month:"short", day:"2-digit", year:"numeric"});
-}
-
-/* ============ Reminders / alarms ============ */
-function buildReminder(date, time, note){
-  if(!date) return null;
-  return { date, time: time || "09:00", note: note || "", fired: false };
-}
-function reminderTime(r){
-  return new Date(`${r.date}T${(r.time||"09:00")}:00`).getTime();
-}
-function fmtReminder(r){
-  const d = new Date(`${r.date}T${(r.time||"09:00")}:00`);
-  return d.toLocaleDateString(undefined, {month:"short", day:"2-digit", year:"numeric"}) +
-    " at " + d.toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"});
-}
-
-/* ============ Image capture / resize ============ */
-function fileToImage(file){
-  return new Promise((resolve,reject)=>{
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = ()=>{ URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = reject;
-    img.src = url;
-  });
-}
-function resize(img, maxW){
-  const scale = Math.min(1, maxW / img.width);
-  const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w; canvas.height = h;
-  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.72);
-}
-async function processImageFile(file){
-  const img = await fileToImage(file);
-  return { thumb: resize(img, 320), image: resize(img, 1280) };
-}
-
-/* ============ Rendering ============ */
-function renderList(){
-  const q = $("searchInput").value.trim().toLowerCase();
-  const wrap = $("listWrap");
-  let list = contacts.slice();
-  if(q){
-    list = list.filter(c =>
-      (c.name||"").toLowerCase().includes(q) ||
-      (c.org||"").toLowerCase().includes(q) ||
-      (c.project||"").toLowerCase().includes(q)
-    );
-  }
-  list.sort((a,b)=> (a.name||"").localeCompare(b.name||"", undefined, {sensitivity:"base", numeric:true}));
-
-  if(!list.length){
-    wrap.innerHTML = `<div class="empty-state">
-      <h2>${contacts.length ? "No matches" : "No cards yet"}</h2>
-      <p>${contacts.length ? "Try a different name, company or project." : "Tap “Scan card” below and point your camera at a business card to add your first contact."}</p>
-    </div>`;
-    return;
-  }
-
-  wrap.innerHTML = list.map(c => {
-    const le = lastEntry(c);
-    const thumb = c.thumb
-      ? `<img class="thumb" src="${c.thumb}" alt="">`
-      : `<div class="thumb placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M15 10h4M15 14h4"/></svg></div>`;
-    return `<div class="row" data-id="${c.id}">
-      ${thumb}
-      <div class="row-main">
-        <div class="row-name">${escapeHtml(c.name || "Unnamed")}</div>
-        <div class="row-org">${escapeHtml(c.org || "—")}</div>
-        ${c.project ? `<div class="row-project">${escapeHtml(c.project)}</div>` : ""}
-      </div>
-      <div class="row-last">
-        <div class="type">${le ? le.type : "Added"}</div>
-        <div class="date">${fmtDate(le ? le.date : c.createdAt.slice(0,10))}</div>
-        ${reminderBadge(c)}
-      </div>
-    </div>`;
-  }).join("");
-}
-function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-
-function reminderBadge(c){
-  if(!c.reminder) return "";
-  const due = !c.reminder.fired && reminderTime(c.reminder) <= Date.now();
-  const bell = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`;
-  return `<div class="row-reminder${due ? " due" : ""}">${bell}${due ? "Due" : fmtDate(c.reminder.date)}</div>`;
-}
-
-/* ============ Sheets ============ */
-function openSheet(id){ $("backdrop").classList.add("open"); $(id).classList.add("open"); }
-function closeSheets(){
-  $("backdrop").classList.remove("open");
-  ["editSheet","detailSheet","settingsSheet"].forEach(id => $(id).classList.remove("open"));
-}
-$("backdrop").addEventListener("click", closeSheets);
-
-/* ============ Add / Edit new contact ============ */
-function resetEditForm(){
-  ["fName","fOrg","fProject","fPhone","fEmail","fNotes","fReminderDate","fReminderNote"].forEach(id => $(id).value = "");
-  $("fType").value = "Met";
-  $("fDate").value = todayStr();
-  $("fReminderTime").value = "09:00";
-  pendingPhoto = { thumb:null, image:null };
-  $("editPhotoPreview").classList.add("hidden");
-  $("ocrStatus").classList.add("hidden");
-  $("editTitle").textContent = "New contact";
-}
-
-/* ============ OCR (on-device, via Tesseract.js) ============ */
-function parseCardText(text){
-  const rawLines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  const emailRe = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-  const phoneRe = /(\+?\d[\d\s().-]{6,}\d)/;
-  const orgRe = /\b(inc|ltd|llc|corp|co\.?|company|group|industries|solutions|enterprises|pvt|limited|technologies|systems|associates|partners|studio)\b/i;
-  const namePatternRe = /^[A-Z][a-zA-Z.'-]+(\s+[A-Z][a-zA-Z.'-]+){1,3}$/;
-
-  let email = "", phone = "", org = "", name = "";
-  const used = new Set();
-
-  rawLines.forEach((line, i) => {
-    if(!email){ const m = line.match(emailRe); if(m){ email = m[0]; used.add(i); } }
-  });
-  rawLines.forEach((line, i) => {
-    if(!phone && !used.has(i)){ const m = line.match(phoneRe); if(m && m[0].replace(/\D/g,"").length >= 7){ phone = m[0].trim(); used.add(i); } }
-  });
-  rawLines.forEach((line, i) => {
-    if(!org && !used.has(i) && orgRe.test(line)){ org = line; used.add(i); }
-  });
-  rawLines.forEach((line, i) => {
-    if(!name && !used.has(i) && namePatternRe.test(line)){ name = line; used.add(i); }
-  });
-  if(!name){
-    const fallback = rawLines.find((l, i) => !used.has(i));
-    if(fallback){ name = fallback; used.add(rawLines.indexOf(fallback)); }
-  }
-  if(!org){
-    const fallback = rawLines.find((l, i) => !used.has(i));
-    if(fallback){ org = fallback; used.add(rawLines.indexOf(fallback)); }
-  }
-  const leftover = rawLines.filter((l, i) => !used.has(i));
-  return { name, org, phone, email, leftover: leftover.join("\n") };
-}
-
-async function runOCRAndFill(file){
-  if(typeof Tesseract === "undefined"){
-    showToast("OCR library still loading — you can fill details in manually");
-    return;
-  }
-  $("ocrStatus").classList.remove("hidden");
-  try{
-    const { data } = await Tesseract.recognize(file, "eng");
-    const parsed = parseCardText(data.text || "");
-    if(!$("fName").value && parsed.name) $("fName").value = parsed.name;
-    if(!$("fOrg").value && parsed.org) $("fOrg").value = parsed.org;
-    if(!$("fPhone").value && parsed.phone) $("fPhone").value = parsed.phone;
-    if(!$("fEmail").value && parsed.email) $("fEmail").value = parsed.email;
-    if(parsed.leftover && !$("fNotes").value){
-      $("fNotes").value = "Detected on card:\n" + parsed.leftover;
-    }
-    showToast("Filled in what we could read — please check before saving");
-  }catch(err){
-    console.error(err);
-    showToast("Couldn't read the card text — fill in manually");
-  }finally{
-    $("ocrStatus").classList.add("hidden");
-  }
-}
-
-$("scanBtn").addEventListener("click", () => { resetEditForm(); $("cameraInput").click(); });
-$("addBtn").addEventListener("click", () => { resetEditForm(); openSheet("editSheet"); });
-
-$("cameraInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if(!file) return;
-  const { thumb, image } = await processImageFile(file);
-  pendingPhoto = { thumb, image };
-  $("editPhotoPreview").src = image;
-  $("editPhotoPreview").classList.remove("hidden");
-  openSheet("editSheet");
-  runOCRAndFill(file);
-});
-
-$("editRetakeBtn").addEventListener("click", () => $("cameraInput").click());
-$("editClose").addEventListener("click", closeSheets);
-
-$("saveBtn").addEventListener("click", async () => {
-  const name = $("fName").value.trim();
-  if(!name){ showToast("Add a name before saving"); return; }
-  const now = new Date().toISOString();
-  const contact = {
-    id: uid(),
-    name,
-    org: $("fOrg").value.trim(),
-    project: $("fProject").value.trim(),
-    phone: $("fPhone").value.trim(),
-    email: $("fEmail").value.trim(),
-    notes: $("fNotes").value.trim(),
-    thumb: pendingPhoto.thumb,
-    image: pendingPhoto.image,
-    history: [{ type: $("fType").value, date: $("fDate").value || todayStr() }],
-    reminder: buildReminder($("fReminderDate").value, $("fReminderTime").value, $("fReminderNote").value.trim()),
-    createdAt: now,
-    updatedAt: now
-  };
-  await put("contacts", contact);
-  contacts.push(contact);
-  sortContactsByName();
-  renderList();
-  closeSheets();
-  showToast("Contact saved");
-});
-
-/* ============ Detail view ============ */
-function openDetail(id){
-  const c = contacts.find(x => x.id === id);
-  if(!c) return;
-  activeId = id;
-  $("detailName").textContent = c.name || "Unnamed";
-  $("dName").value = c.name || "";
-  $("dOrg").value = c.org || "";
-  $("dProject").value = c.project || "";
-  $("dPhone").value = c.phone || "";
-  $("dEmail").value = c.email || "";
-  $("dNotes").value = c.notes || "";
-  $("dLogDate").value = todayStr();
-  if(c.image){ $("detailPhoto").src = c.image; $("detailPhoto").classList.remove("hidden"); }
-  else { $("detailPhoto").classList.add("hidden"); }
-  renderHistory(c);
-  renderReminderFields(c);
-  openSheet("detailSheet");
-}
-
-function renderReminderFields(c){
-  if(c.reminder){
-    $("dReminderDate").value = c.reminder.date;
-    $("dReminderTime").value = c.reminder.time || "09:00";
-    $("dReminderNote").value = c.reminder.note || "";
-    $("dReminderCurrent").textContent = (c.reminder.fired ? "Alarm already went off for " : "Alarm set for ") + fmtReminder(c.reminder);
-    $("dReminderCurrent").classList.remove("hidden");
-  } else {
-    $("dReminderDate").value = "";
-    $("dReminderTime").value = "09:00";
-    $("dReminderNote").value = "";
-    $("dReminderCurrent").classList.add("hidden");
-  }
-}
-
-function renderHistory(c){
-  const items = (c.history||[]).slice().sort((a,b)=> a.date < b.date ? 1 : -1);
-  $("dHistory").innerHTML = items.map(h => `
-    <div class="history-item">
-      <div>
-        <span class="h-type">${escapeHtml(h.type)}</span>
-        ${h.note ? `<span class="h-note">${escapeHtml(h.note)}</span>` : ""}
-      </div>
-      <div class="h-date">${fmtDate(h.date)}</div>
-    </div>`).join("") || `<div class="settings-note">No interactions logged yet.</div>`;
-}
-
-$("listWrap").addEventListener("click", (e) => {
-  const row = e.target.closest(".row");
-  if(row) openDetail(row.dataset.id);
-});
-$("detailClose").addEventListener("click", closeSheets);
-
-$("dSaveBtn").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
-  if(!c) return;
-  c.name = $("dName").value.trim() || c.name;
-  c.org = $("dOrg").value.trim();
-  c.project = $("dProject").value.trim();
-  c.phone = $("dPhone").value.trim();
-  c.email = $("dEmail").value.trim();
-  c.notes = $("dNotes").value.trim();
-  c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  sortContactsByName();
-  $("detailName").textContent = c.name;
-  renderList();
-  showToast("Changes saved");
-});
-
-$("dLogAdd").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
-  if(!c) return;
-  c.history = c.history || [];
-  c.history.push({ type: $("dLogType").value, date: $("dLogDate").value || todayStr() });
-  c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  renderHistory(c);
-  renderList();
-  showToast("Interaction logged");
-});
-
-$("dReminderSet").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
-  if(!c) return;
-  const date = $("dReminderDate").value;
-  if(!date){ showToast("Pick a date for the reminder"); return; }
-  c.reminder = buildReminder(date, $("dReminderTime").value, $("dReminderNote").value.trim());
-  c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  renderReminderFields(c);
-  renderList();
-  await requestNotifyPermission();
-  showToast("Alarm set for " + fmtReminder(c.reminder));
-});
-
-$("dReminderClear").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
-  if(!c || !c.reminder) return;
-  c.reminder = null;
-  c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  renderReminderFields(c);
-  renderList();
-  showToast("Reminder cleared");
-});
-
-$("dRetakeBtn").addEventListener("click", () => $("retakeInput").click());
-$("retakeInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if(!file || !activeId) return;
-  const { thumb, image } = await processImageFile(file);
-  const c = contacts.find(x => x.id === activeId);
-  c.thumb = thumb; c.image = image; c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  $("detailPhoto").src = image;
-  $("detailPhoto").classList.remove("hidden");
-  renderList();
-  showToast("Photo updated");
-});
-
-$("dDeleteBtn").addEventListener("click", async () => {
-  if(!activeId) return;
-  if(!confirm("Delete this contact? This can't be undone.")) return;
-  await del("contacts", activeId);
-  contacts = contacts.filter(c => c.id !== activeId);
-  renderList();
-  closeSheets();
-  showToast("Contact deleted");
-});
-
-/* ============ Search ============ */
-$("searchInput").addEventListener("input", renderList);
-
-/* ============ Settings / backup / restore ============ */
-$("settingsBtn").addEventListener("click", async () => {
-  $("clientIdInput").value = await getSetting("driveClientId", "");
-  const token = await getSetting("driveToken", null);
-  $("storageStatus").textContent = token ? "Synced with Google Drive" : "Stored on this device only";
-  $("storageStatus").className = "status-pill" + (token ? "" : "");
-  if(location.protocol === "file:") $("fileProtocolWarn").classList.remove("hidden");
-  const last = await getSetting("lastSync", null);
-  if(last){
-    $("lastSyncNote").textContent = "Last synced: " + new Date(last).toLocaleString();
-    $("lastSyncNote").classList.remove("hidden");
-  }
-  openSheet("settingsSheet");
-});
-$("settingsClose").addEventListener("click", closeSheets);
-
-$("backupBtn").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), contacts }, null, 2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `card-ledger-backup-${todayStr()}.json`;
-  a.click();
-  showToast("Backup downloaded");
-});
-
-$("restoreBtn").addEventListener("click", () => $("restoreInput").click());
-$("restoreInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if(!file) return;
-  try{
-    const data = JSON.parse(await file.text());
-    const incoming = Array.isArray(data.contacts) ? data.contacts : data;
-    if(!Array.isArray(incoming)) throw new Error("bad format");
-    let added = 0;
-    for(const c of incoming){
-      if(!c.id) c.id = uid();
-      const existing = contacts.find(x => x.id === c.id);
-      if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
-        await put("contacts", c);
-        contacts = contacts.filter(x => x.id !== c.id);
-        contacts.push(c);
-        added++;
-      }
-    }
-    sortContactsByName();
-    renderList();
-    showToast(`Restored ${added} contact(s)`);
-  }catch(err){
-    showToast("Couldn't read that backup file");
-  }
-});
-
-/* ============ Google Drive sync ============ */
-const DRIVE_FILE_NAME = "card-ledger-backup.json";
-let tokenClient = null;
-let accessToken = null;
-
-async function ensureTokenClient(){
-  const clientId = $("clientIdInput").value.trim();
-  if(!clientId){ showToast("Paste your Google Client ID first"); return null; }
-  await setSetting("driveClientId", clientId);
-  if(typeof google === "undefined" || !google.accounts){
-    showToast("Google sign-in script hasn't loaded — check your connection");
-    return null;
-  }
-  if(!tokenClient || tokenClient._clientId !== clientId){
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: clientId,
-      scope: "https://www.googleapis.com/auth/drive.file",
-      callback: () => {}
-    });
-    tokenClient._clientId = clientId;
-  }
-  return tokenClient;
-}
-
-function requestToken(client){
-  return new Promise((resolve, reject) => {
-    client.callback = (resp) => {
-      if(resp.error) reject(resp);
-      else resolve(resp.access_token);
-    };
-    client.requestAccessToken({ prompt: accessToken ? "" : "consent" });
-  });
-}
-
-async function driveFindFile(token){
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE_NAME}'+and+trashed=false&spaces=drive&fields=files(id,name,modifiedTime)`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await res.json();
-  return (data.files && data.files[0]) || null;
-}
-
-async function driveDownload(token, fileId){
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  return res.json();
-}
-
-async function driveUpload(token, fileId, payload){
-  const body = JSON.stringify(payload);
-  const metadata = { name: DRIVE_FILE_NAME, mimeType: "application/json" };
-  const boundary = "cardledgerboundary";
-  const multipartBody =
-    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(fileId ? {} : metadata)}\r\n` +
-    `--${boundary}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${boundary}--`;
-  const url = fileId
-    ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
-    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
-  const res = await fetch(url, {
-    method: fileId ? "PATCH" : "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": `multipart/related; boundary=${boundary}` },
-    body: multipartBody
-  });
-  return res.json();
-}
-
-async function syncWithDrive(){
-  const client = await ensureTokenClient();
-  if(!client) return;
-  try{
-    showToast("Connecting to Google Drive…");
-    accessToken = await requestToken(client);
-    await setSetting("driveToken", true);
-
-    const existing = await driveFindFile(accessToken);
-    let merged = contacts.slice();
-
-    if(existing){
-      const remote = await driveDownload(accessToken, existing.id);
-      const remoteContacts = Array.isArray(remote.contacts) ? remote.contacts : [];
-      const byId = {};
-      merged.forEach(c => byId[c.id] = c);
-      remoteContacts.forEach(rc => {
-        const local = byId[rc.id];
-        if(!local || new Date(rc.updatedAt||0) > new Date(local.updatedAt||0)){
-          byId[rc.id] = rc;
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
-      });
-      merged = Object.values(byId);
-      for(const c of merged) await put("contacts", c);
-      contacts = merged;
-      sortContactsByName();
-      merged = contacts;
-    }
 
-    await driveUpload(accessToken, existing ? existing.id : null, { exportedAt: new Date().toISOString(), contacts: merged });
-    await setSetting("lastSync", new Date().toISOString());
-    renderList();
-    showToast("Synced with Google Drive");
-  }catch(err){
-    console.error(err);
-    showToast("Drive sync failed — check the Client ID and origin setup");
-  }
-}
+        function sortContactsByClientName() {
+            contacts.sort((a, b) => {
+                const an = (a.clientName || a.name || '').toLowerCase();
+                const bn = (b.clientName || b.name || '').toLowerCase();
+                return an.localeCompare(bn, undefined, { sensitivity: 'base', numeric: true });
+            });
+        }
+        sortContactsByClientName();
 
-$("connectDriveBtn").addEventListener("click", syncWithDrive);
-$("syncBtn").addEventListener("click", syncWithDrive);
-$("disconnectDriveBtn").addEventListener("click", async () => {
-  accessToken = null;
-  await setSetting("driveToken", null);
-  showToast("Disconnected from Drive");
-  $("storageStatus").textContent = "Stored on this device only";
-});
+        function updateMetrics() {
+            document.getElementById('cnt-high').innerText = contacts.filter(c => c.potential === 'High Potential').length;
+            document.getElementById('cnt-warm').innerText = contacts.filter(c => c.potential === 'Warm Potential').length;
+            document.getElementById('cnt-occ').innerText = contacts.filter(c => c.potential === 'Occasional').length;
+        }
 
-/* ============ Reminder alarm engine ============ */
-async function requestNotifyPermission(){
-  if(typeof Notification === "undefined") return "unsupported";
-  if(Notification.permission === "default"){
-    try{ return await Notification.requestPermission(); }catch(e){ return Notification.permission; }
-  }
-  return Notification.permission;
-}
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCards();
+        }
 
-function playAlarmSound(){
-  try{
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new Ctx();
-    const beep = (start) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime + start);
-      gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + 0.3);
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + start);
-      osc.stop(ctx.currentTime + start + 0.32);
-    };
-    [0, 0.4, 0.8].forEach(beep);
-  }catch(e){ /* audio not available, silently skip */ }
-}
+        function renderCards() {
+            updateMetrics();
+            const list = document.getElementById('cardsList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            list.innerHTML = '';
 
-const alarmQueue = [];
-function showAlarmBanner(){
-  const wrap = $("alarmBannerItems");
-  wrap.innerHTML = alarmQueue.map(c => `
-    <div class="ab-item">
-      <b>${escapeHtml(c.name || "Unnamed")}</b>
-      ${escapeHtml((c.reminder && c.reminder.note) || "Reminder due")}
-    </div>`).join("");
-  $("alarmBanner").classList.add("show");
-}
-$("alarmBannerDismiss").addEventListener("click", () => {
-  alarmQueue.length = 0;
-  $("alarmBanner").classList.remove("show");
-});
+            const filtered = contacts.filter(c => {
+                const matchesFilter = (currentFilter === 'All' || c.potential === currentFilter);
+                const clientName = c.clientName || c.name || '';
+                const firmName = c.firmName || '';
+                const matchesSearch = clientName.toLowerCase().includes(search) ||
+                                      firmName.toLowerCase().includes(search) ||
+                                      (c.specialization || '').toLowerCase().includes(search) ||
+                                      (c.city || '').toLowerCase().includes(search);
+                return matchesFilter && matchesSearch;
+            });
 
-async function fireAlarm(c){
-  playAlarmSound();
-  const perm = (typeof Notification !== "undefined") ? Notification.permission : "unsupported";
-  if(perm === "granted"){
-    try{
-      new Notification("Reminder: " + (c.name || "Contact"), {
-        body: (c.reminder && c.reminder.note) || "Time to follow up",
-        tag: "card-ledger-" + c.id
-      });
-    }catch(e){ /* some browsers restrict Notification() outside SW, banner still shows */ }
-  }
-  alarmQueue.push(c);
-  showAlarmBanner();
-}
+            filtered.sort((a, b) => {
+                const an = (a.clientName || a.name || '').toLowerCase();
+                const bn = (b.clientName || b.name || '').toLowerCase();
+                return an.localeCompare(bn, undefined, { sensitivity: 'base', numeric: true });
+            });
 
-async function checkReminders(){
-  const now = Date.now();
-  let changed = false;
-  for(const c of contacts){
-    if(c.reminder && !c.reminder.fired && reminderTime(c.reminder) <= now){
-      c.reminder.fired = true;
-      c.updatedAt = new Date().toISOString();
-      await put("contacts", c);
-      changed = true;
-      fireAlarm(c);
-    }
-  }
-  if(changed) renderList();
-}
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#888; margin-top:30px;">No leads found.</p>';
+                return;
+            }
 
-$("remindersBtn").addEventListener("click", async () => {
-  const perm = await requestNotifyPermission();
-  if(perm === "granted") showToast("Reminder alarms enabled");
-  else if(perm === "unsupported") showToast("This browser can't show notifications, but in-app alarms will still work");
-  else showToast("Notifications blocked — in-app alarms will still show while this tab is open");
-});
+            filtered.forEach(c => {
+                const img = c.cardImg || 'https://via.placeholder.com/70?text=Card';
+                const cleanPhone = (c.phone || '').replace(/\D/g, '');
+                const clientName = escapeHtml(c.clientName || c.name || 'Unnamed');
+                const firmName = c.firmName ? `${escapeHtml(c.firmName)} · ` : '';
+                const reminderHtml = reminderBadge(c);
 
-/* ============ Boot ============ */
-(async function init(){
-  contacts = await getAll("contacts");
-  sortContactsByName();
-  renderList();
-  const clientId = await getSetting("driveClientId", "");
-  if(clientId) $("clientIdInput").value = clientId;
-  checkReminders();
-  setInterval(checkReminders, 20000);
-})();
+                list.innerHTML += `
+                    <div class="lead-card">
+                        <div class="card-top">
+                            <img src="${img}" class="card-thumb" onclick="openEditModal(${c.id})">
+                            <div class="card-details">
+                                <div class="card-title" onclick="openEditModal(${c.id})" style="cursor:pointer;">${clientName}</div>
+                                <div class="card-sub">${firmName}📍 ${escapeHtml(c.city || '')} | ${escapeHtml(c.specialization || '')}</div>
+                                <div class="card-notes">${escapeHtml(c.notes || 'No notes added.')}</div>
+                                <div class="card-date">Last contact: ${escapeHtml(c.date || '')}</div>
+                                ${reminderHtml}
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            ${cleanPhone ? `<a href="tel:${escapeHtml(cleanPhone)}" class="action-btn">📞</a>` : ''}
+                            ${cleanPhone ? `<a href="https://wa.me/${escapeHtml(cleanPhone)}" class="action-btn">💬</a>` : ''}
+                            ${c.email ? `<a href="mailto:${escapeHtml(c.email)}" class="action-btn">✉️</a>` : ''}
+                            <button class="action-btn" style="border:none; cursor:pointer;" onclick="openReminderModal(${c.id})">⏰</button>
+                            <button class="action-btn" style="border:none; cursor:pointer;" onclick="openEditModal(${c.id})">✏️</button>
+                            <button class="action-btn" style="border:none; cursor:pointer; background:#fdeaea;" onclick="deleteContact(${c.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-})();
-</script>
+        function reminderBadge(c) {
+            if (!c.reminder) return '';
+            const due = !c.reminder.fired && reminderTime(c.reminder) <= Date.now();
+            return `<div class="card-reminder${due ? ' due' : ''}">⏰ ${due ? 'Reminder due' : 'Reminder: ' + fmtReminder(c.reminder)}</div>`;
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // OCR Scanner & Form Auto-fill Logic
+        async function scanCard(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Save image thumbnail for card display
+            const reader = new FileReader();
+            reader.onload = function(e) { document.getElementById('cardImgData').value = e.target.result; };
+            reader.readAsDataURL(file);
+
+            const status = document.getElementById('ocrStatus');
+            status.innerText = '⏳ Reading card text...';
+            
+            try {
+                const ret = await Tesseract.recognize(file, 'eng');
+                const text = ret.data.text;
+                
+                // Regex extraction rules
+                const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                const phoneMatch = text.match(/(\+?\d[\d\s().-]{8,}\d)/);
+                
+                // Extract possible name (first non-empty text line)
+                const textLines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+                const possibleName = textLines.length > 0 ? textLines[0] : '';
+                
+                // Auto-fill form fields
+                if (possibleName) document.getElementById('clientName').value = possibleName;
+                if (emailMatch) document.getElementById('email').value = emailMatch[0];
+                if (phoneMatch) document.getElementById('phone').value = phoneMatch[0].replace(/\s+/g, '');
+                
+                status.innerText = '✅ Card Scanned! Verify & edit details below.';
+            } catch (err) {
+                status.innerText = '⚠️ Could not read card text automatically. Please enter details manually.';
+            }
+        }
+
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('architectForm').reset();
+            document.getElementById('cardImgData').value = '';
+            document.getElementById('ocrStatus').innerText = '';
+            document.getElementById('addModalTitle').innerText = 'Add Architect / Designer';
+            document.getElementById('reminderFieldset').style.display = 'block';
+            document.getElementById('deleteContactBtn').style.display = 'none';
+            openModal('addModal');
+        }
+
+        function openEditModal(id) {
+            const c = contacts.find(x => x.id === id);
+            if (!c) return;
+            editingId = id;
+            document.getElementById('clientName').value = c.clientName || c.name || '';
+            document.getElementById('firmName').value = c.firmName || '';
+            document.getElementById('city').value = c.city || '';
+            document.getElementById('specialization').value = c.specialization || 'Luxury Villa Project';
+            document.getElementById('phone').value = c.phone || '';
+            document.getElementById('email').value = c.email || '';
+            document.getElementById('potential').value = c.potential || 'Warm Potential';
+            document.getElementById('notes').value = c.notes || '';
+            document.getElementById('cardImgData').value = c.cardImg || '';
+            document.getElementById('ocrStatus').innerText = '';
+            document.getElementById('addModalTitle').innerText = 'Edit Architect / Designer';
+            document.getElementById('reminderFieldset').style.display = 'none';
+            document.getElementById('deleteContactBtn').style.display = 'block';
+            openModal('addModal');
+        }
+
+        function deleteContact(id) {
+            const c = contacts.find(x => x.id === id);
+            if (!c) return;
+            const label = c.clientName || c.name || 'this contact';
+            if (!confirm(`Delete ${label}? This can't be undone.`)) return;
+            contacts = contacts.filter(x => x.id !== id);
+            localStorage.setItem('architect_contacts', JSON.stringify(contacts));
+            renderCards();
+        }
+
+        function deleteFromModal() {
+            if (editingId == null) return;
+            const id = editingId;
+            closeModal('addModal');
+            deleteContact(id);
+        }
+
+        function saveArchitect(e) {
+            e.preventDefault();
+            const fields = {
+                clientName: document.getElementById('clientName').value.trim(),
+                firmName: document.getElementById('firmName').value.trim(),
+                city: document.getElementById('city').value,
+                specialization: document.getElementById('specialization').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                potential: document.getElementById('potential').value,
+                notes: document.getElementById('notes').value,
+                cardImg: document.getElementById('cardImgData').value
+            };
+
+            if (editingId != null) {
+                const c = contacts.find(x => x.id === editingId);
+                if (c) Object.assign(c, fields);
+            } else {
+                const newEntry = Object.assign({
+                    id: Date.now(),
+                    reminder: buildReminder(
+                        document.getElementById('newRemDate').value,
+                        document.getElementById('newRemTime').value,
+                        document.getElementById('newRemNote').value.trim()
+                    ),
+                    date: new Date().toLocaleDateString()
+                }, fields);
+                contacts.unshift(newEntry);
+            }
+
+            sortContactsByClientName();
+            localStorage.setItem('architect_contacts', JSON.stringify(contacts));
+            closeModal('addModal');
+            renderCards();
+            document.getElementById('architectForm').reset();
+            document.getElementById('ocrStatus').innerText = '';
+            editingId = null;
+        }
+
+        function backupToDrive() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(contacts, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `architects_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            alert("Backup file downloaded! Save this file directly to your Google Drive.");
+        }
+
+        function restoreFromDrive(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedContacts = JSON.parse(e.target.result);
+                    if (Array.isArray(importedContacts)) {
+                        contacts = importedContacts;
+                        sortContactsByClientName();
+                        localStorage.setItem('architect_contacts', JSON.stringify(contacts));
+                        renderCards();
+                        alert("Database restored successfully!");
+                        closeModal('settingsModal');
+                    } else {
+                        alert("Invalid JSON format.");
+                    }
+                } catch (err) {
+                    alert("Error reading JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ============ Reminders / Alarms ============ */
+        function buildReminder(date, time, note) {
+            if (!date) return null;
+            return { date, time: time || '09:00', note: note || '', fired: false };
+        }
+        function reminderTime(r) {
+            return new Date(`${r.date}T${r.time || '09:00'}:00`).getTime();
+        }
+        function fmtReminder(r) {
+            const d = new Date(`${r.date}T${r.time || '09:00'}:00`);
+            return d.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' }) +
+                ' at ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        }
+
+        let activeReminderId = null;
+        function openReminderModal(id) {
+            activeReminderId = id;
+            const c = contacts.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('reminderForName').innerText = 'For: ' + (c.clientName || c.name || 'Unnamed');
+            document.getElementById('remDate').value = c.reminder ? c.reminder.date : '';
+            document.getElementById('remTime').value = c.reminder ? c.reminder.time : '09:00';
+            document.getElementById('remNote').value = c.reminder ? c.reminder.note : '';
+            openModal('reminderModal');
+        }
+        function saveReminder() {
+            const c = contacts.find(x => x.id === activeReminderId);
+            if (!c) return;
+            const date = document.getElementById('remDate').value;
+            if (!date) { alert('Pick a date for the reminder first.'); return; }
+            c.reminder = buildReminder(date, document.getElementById('remTime').value, document.getElementById('remNote').value.trim());
+            localStorage.setItem('architect_contacts', JSON.stringify(contacts));
+            closeModal('reminderModal');
+            renderCards();
+            requestNotifyPermission(false);
+        }
+        function clearReminder() {
+            const c = contacts.find(x => x.id === activeReminderId);
+            if (!c) return;
+            c.reminder = null;
+            localStorage.setItem('architect_contacts', JSON.stringify(contacts));
+            closeModal('reminderModal');
+            renderCards();
+        }
+
+        async function requestNotifyPermission(announce) {
+            if (typeof Notification === 'undefined') {
+                if (announce) alert("This browser can't show notifications, but in-app alarms will still work while this tab is open.");
+                return 'unsupported';
+            }
+            let perm = Notification.permission;
+            if (perm === 'default') {
+                try { perm = await Notification.requestPermission(); } catch (e) { /* ignore */ }
+            }
+            if (announce) {
+                if (perm === 'granted') alert('Alarm notifications enabled!');
+                else alert('Notifications are blocked — in-app alarms will still show while this tab is open.');
+            }
+            return perm;
+        }
+
+        function playAlarmSound() {
+            try {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new Ctx();
+                const beep = (start) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.0001, ctx.currentTime + start);
+                    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + start + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + 0.3);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + start);
+                    osc.stop(ctx.currentTime + start + 0.32);
+                };
+                [0, 0.4, 0.8].forEach(beep);
+            } catch (e) { /* audio unavailable, skip silently */ }
+        }
+
+        function showAlarmBanner(dueContacts) {
+            const text = dueContacts.map(c => `${c.clientName || c.name}: ${(c.reminder && c.reminder.note) || 'Reminder due'}`).join(' • ');
+            document.getElementById('alarmBannerText').innerText = text;
+            document.getElementById('alarmBanner').style.display = 'block';
+        }
+        function dismissAlarmBanner() {
+            document.getElementById('alarmBanner').style.display = 'none';
+        }
+
+        function checkReminders() {
+            const now = Date.now();
+            const due = [];
+            let changed = false;
+            contacts.forEach(c => {
+                if (c.reminder && !c.reminder.fired && reminderTime(c.reminder) <= now) {
+                    c.reminder.fired = true;
+                    changed = true;
+                    due.push(c);
+                }
+            });
+            if (due.length) {
+                playAlarmSound();
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                    due.forEach(c => {
+                        try {
+                            new Notification('Reminder: ' + (c.clientName || c.name), {
+                                body: (c.reminder && c.reminder.note) || 'Time to follow up',
+                                tag: 'crm-reminder-' + c.id
+                            });
+                        } catch (e) { /* some browsers restrict this, banner still shows */ }
+                    });
+                }
+                showAlarmBanner(due);
+            }
+            if (changed) {
+                localStorage.setItem('architect_contacts', JSON.stringify(contacts));
+                renderCards();
+            }
+        }
+        setInterval(checkReminders, 20000);
+
+        renderCards();
+        checkReminders();
+    </script>
 </body>
 </html>
