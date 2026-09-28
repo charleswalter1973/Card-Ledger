@@ -21,7 +21,6 @@
     --line:#DCDFE4;
     --shadow: 0 1px 0 rgba(22,33,62,0.04);
     --radius: 10px;
-    /* freshness colors */
     --fresh-green:#2E7D32;
     --fresh-blue:#1565C0;
     --fresh-yellow:#C9A227;
@@ -85,7 +84,6 @@
     cursor:pointer;
   }
   .icon-btn svg{width:18px;height:18px;}
-  .icon-btn.pine{border-color:rgba(120,200,170,0.5);}
   .search-wrap{
     margin-top:14px;
     position:relative;
@@ -107,7 +105,6 @@
     color:var(--ink);
   }
   .search-wrap input:focus{outline:2px solid var(--brass);outline-offset:1px;}
-
   .col-labels{
     display:flex;
     padding:12px 18px 8px;
@@ -131,7 +128,6 @@
   .row-wrap.fresh-blue{border-left-color:var(--fresh-blue);}
   .row-wrap.fresh-yellow{border-left-color:var(--fresh-yellow);}
   .row-wrap.fresh-orange{border-left-color:var(--fresh-orange);}
-
   .row{
     display:flex;
     align-items:center;
@@ -199,7 +195,6 @@
   .type.fresh-yellow{color:var(--fresh-yellow);}
   .type.fresh-orange{color:var(--fresh-orange);}
 
-  /* row action icons */
   .row-icons{
     display:flex;
     gap:6px;
@@ -236,7 +231,6 @@
     margin-bottom:6px;
   }
   .empty-state p{font-size:0.9rem;line-height:1.5;}
-
   /* ---------- Bottom action bar ---------- */
   .action-bar{
     position:fixed;
@@ -368,7 +362,7 @@
     margin:18px 0 8px;
   }
   .log-form{
-    display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;
+    display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;
   }
   .log-form select, .log-form input{
     padding:9px;
@@ -393,8 +387,6 @@
     line-height:1.55;
     margin-bottom:14px;
   }
-  .settings-note b{color:var(--ink);}
-  .settings-note ol{margin:6px 0 0;padding-left:18px;}
   .status-pill{
     display:inline-flex;align-items:center;gap:5px;
     font-size:0.76rem;font-weight:600;
@@ -402,7 +394,6 @@
     background:#E4EDE9;color:var(--pine);
     margin-bottom:12px;
   }
-  .status-pill.warn{background:#F4E4DF;color:var(--rust);}
   .hidden{display:none !important;}
   .toast{
     position:fixed;
@@ -468,9 +459,7 @@
     <div class="c3">Last contact</div>
   </div>
 
-  <main id="listWrap">
-    <!-- rows injected here -->
-  </main>
+  <main id="listWrap"></main>
 
   <div class="action-bar">
     <button class="btn primary" id="scanBtn">
@@ -483,13 +472,11 @@
     </button>
   </div>
 </div>
-
 <input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
 <input type="file" accept="image/*" id="galleryInput" class="hidden">
 <input type="file" accept="image/*" id="retakeInput" class="hidden">
 <input type="file" accept="application/json" id="restoreInput" class="hidden">
 
-<!-- Backdrop shared -->
 <div class="sheet-backdrop" id="backdrop"></div>
 
 <!-- Add / Edit sheet -->
@@ -507,7 +494,7 @@
 
     <div class="photo-btn-row">
       <button class="btn outline" id="editCameraBtn">📷 Camera</button>
-      <button class="btn outline" id="editGalleryBtn">🖼️ Gallery</button>
+      <button class="btn outline" id="editGalleryBtn">🖼️ Gallery / File</button>
     </div>
 
     <div class="field">
@@ -523,31 +510,18 @@
       <input type="text" id="fProject" placeholder="e.g. Warehouse automation deal">
     </div>
     <div class="field-row">
-      <div class="field">
-        <label>Phone</label>
-        <input type="tel" id="fPhone">
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="fEmail">
-      </div>
+      <div class="field"><label>Phone</label><input type="tel" id="fPhone"></div>
+      <div class="field"><label>Email</label><input type="email" id="fEmail"></div>
     </div>
     <div class="field-row">
       <div class="field">
         <label>How did you get this card?</label>
         <select id="fType">
-          <option>Met</option>
-          <option>Contacted</option>
-          <option>Called</option>
-          <option>Emailed</option>
-          <option>Visited</option>
-          <option>Follow-up</option>
+          <option>Met</option><option>Contacted</option><option>Called</option>
+          <option>Emailed</option><option>Visited</option><option>Follow-up</option>
         </select>
       </div>
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="fDate">
-      </div>
+      <div class="field"><label>Date</label><input type="date" id="fDate"></div>
     </div>
     <div class="field">
       <label>Notes</label>
@@ -572,30 +546,15 @@
   </div>
   <div class="sheet-body">
     <img id="detailPhoto" class="card-photo hidden" alt="">
-    <div class="field">
-      <label>Name</label>
-      <input type="text" id="dName">
-    </div>
-    <div class="field">
-      <label>Company</label>
-      <input type="text" id="dOrg">
-    </div>
-    <div class="field">
-      <label>Project / role</label>
-      <input type="text" id="dProject">
-    </div>
+    <div class="field"><label>Name</label><input type="text" id="dName"></div>
+    <div class="field"><label>Company</label><input type="text" id="dOrg"></div>
+    <div class="field"><label>Project / role</label><input type="text" id="dProject"></div>
     <div class="field-row">
       <div class="field"><label>Phone</label><input type="tel" id="dPhone"></div>
       <div class="field"><label>Email</label><input type="email" id="dEmail"></div>
     </div>
-    <div class="field">
-      <label>Notes</label>
-      <textarea id="dNotes"></textarea>
-    </div>
-    <div class="field">
-      <label>Next follow-up date</label>
-      <input type="date" id="dNextFollow">
-    </div>
+    <div class="field"><label>Notes</label><textarea id="dNotes"></textarea></div>
+    <div class="field"><label>Next follow-up date</label><input type="date" id="dNextFollow"></div>
     <button class="btn outline block" id="dSaveBtn">Save changes</button>
 
     <div style="display:flex;gap:8px;margin-top:10px;">
@@ -606,7 +565,8 @@
     <div class="section-label">Log a new interaction</div>
     <div class="log-form">
       <select id="dLogType">
-        <option>Contacted</option><option>Met</option><option>Called</option><option>Emailed</option><option>Visited</option><option>Follow-up</option>
+        <option>Contacted</option><option>Met</option><option>Called</option>
+        <option>Emailed</option><option>Visited</option><option>Follow-up</option>
       </select>
       <input type="date" id="dLogDate">
       <button id="dLogAdd">Add</button>
@@ -636,14 +596,12 @@
   </div>
   <div class="sheet-body">
     <div id="storageStatus" class="status-pill">Stored on this device only</div>
-
     <div class="section-label">Local backup</div>
-    <div class="settings-note">Everything is saved on this device automatically (photos included). Use these buttons any time to make a portable copy, or move that copy into your own Google Drive folder manually.</div>
+    <div class="settings-note">Everything is saved on this device automatically (photos included). Use these buttons any time to make a portable copy.</div>
     <div style="display:flex;gap:10px;margin-bottom:22px;">
       <button class="btn outline" id="backupBtn">Download backup</button>
       <button class="btn outline" id="restoreBtn">Restore backup</button>
     </div>
-
     <div class="section-label">Data safety</div>
     <div class="settings-note">
       All data lives in your browser's IndexedDB on this device only. Nothing is uploaded to any server unless you download a backup and store it yourself. Keep regular backups — clearing browser data will erase everything.
@@ -652,7 +610,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script>
 (function(){
 "use strict";
@@ -675,7 +632,6 @@ function getAll(store){ return tx(store,"readonly").then(s => new Promise((res,r
 function put(store, val){ return tx(store,"readwrite").then(s => new Promise((res,rej)=>{ const r=s.put(val); r.onsuccess=()=>res(val); r.onerror=()=>rej(r.error); })); }
 function del(store, key){ return tx(store,"readwrite").then(s => new Promise((res,rej)=>{ const r=s.delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); })); }
 function getOne(store, key){ return tx(store,"readonly").then(s => new Promise((res,rej)=>{ const r=s.get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })); }
-
 function getSetting(key, fallback){ return getOne("settings", key).then(r => r ? r.value : fallback); }
 function setSetting(key, value){ return put("settings", {key, value}); }
 
@@ -695,26 +651,21 @@ function showToast(msg){
   clearTimeout(t._h);
   t._h = setTimeout(()=>t.classList.remove("show"), 2200);
 }
-
 function lastEntry(c){
   if(!c.history || !c.history.length) return null;
   return c.history.slice().sort((a,b)=> a.date < b.date ? 1 : -1)[0];
 }
-
 function fmtDate(iso){
   if(!iso) return "—";
   const d = new Date(iso + "T00:00:00");
   if(isNaN(d)) return "—";
   return d.toLocaleDateString(undefined, {month:"short", day:"2-digit", year:"numeric"});
 }
-
 function daysBetween(isoA, isoB){
   const a = new Date(isoA + "T00:00:00");
   const b = new Date(isoB + "T00:00:00");
   return Math.round((b - a) / 86400000);
 }
-
-/* freshness bucket based on last contact */
 function freshness(iso){
   if(!iso) return { cls:"fresh-orange", label:"Never" };
   const days = daysBetween(iso, todayStr());
@@ -723,6 +674,12 @@ function freshness(iso){
   if(days <= 90) return { cls:"fresh-yellow", label: days + "d ago" };
   return { cls:"fresh-orange", label: days + "d ago" };
 }
+function escapeHtml(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+function safePhone(p){ return String(p || "").replace(/[^\d+]/g, ""); }
 
 /* ============ Image capture / resize ============ */
 function fileToImage(file){
@@ -747,15 +704,409 @@ async function processImageFile(file){
   return { thumb: resize(img, 320), image: resize(img, 1280) };
 }
 
-/* ============ Safe HTML ============ */
-function escapeHtml(s){
-  return String(s == null ? "" : s).replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[m]));
+/* ============ OCR ============ */
+function parseCardText(text){
+  const rawLines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const emailRe = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+  const phoneRe = /(\+?\d[\d\s().-]{6,}\d)/;
+  const orgRe = /\b(inc|ltd|llc|corp|co\.?|company|group|industries|solutions|enterprises|pvt|limited|technologies|systems|associates|partners|studio)\b/i;
+  const namePatternRe = /^[A-Z][a-zA-Z.'-]+(\s+[A-Z][a-zA-Z.'-]+){1,3}$/;
+  let email = "", phone = "", org = "", name = "";
+  const used = new Set();
+  rawLines.forEach((line, i) => { if(!email){ const m = line.match(emailRe); if(m){ email = m[0]; used.add(i); } } });
+  rawLines.forEach((line, i) => { if(!phone && !used.has(i)){ const m = line.match(phoneRe); if(m && m[0].replace(/\D/g,"").length >= 7){ phone = m[0].trim(); used.add(i); } } });
+  rawLines.forEach((line, i) => { if(!org && !used.has(i) && orgRe.test(line)){ org = line; used.add(i); } });
+  rawLines.forEach((line, i) => { if(!name && !used.has(i) && namePatternRe.test(line)){ name = line; used.add(i); } });
+  if(!name){ const f = rawLines.find((l,i)=>!used.has(i)); if(f){ name = f; used.add(rawLines.indexOf(f)); } }
+  if(!org){ const f = rawLines.find((l,i)=>!used.has(i)); if(f){ org = f; used.add(rawLines.indexOf(f)); } }
+  const leftover = rawLines.filter((l,i)=>!used.has(i));
+  return { name, org, phone, email, leftover: leftover.join("\n") };
 }
-function safePhone(p){ return String(p || "").replace(/[^\d+]/g, ""); }
-function safeEmail(e){ return String(e || "").trim(); }
-
+async function runOCRAndFill(file){
+  if(typeof Tesseract === "undefined"){ showToast("OCR library not loaded — fill manually"); return; }
+  $("ocrStatus").classList.remove("hidden");
+  try{
+    const { data } = await Tesseract.recognize(file, "eng");
+    const parsed = parseCardText(data.text || "");
+    if(!$("fName").value && parsed.name) $("fName").value = parsed.name;
+    if(!$("fOrg").value && parsed.org) $("fOrg").value = parsed.org;
+    if(!$("fPhone").value && parsed.phone) $("fPhone").value = parsed.phone;
+    if(!$("fEmail").value && parsed.email) $("fEmail").value = parsed.email;
+    if(parsed.leftover && !$("fNotes").value) $("fNotes").value = "Detected on card:\n" + parsed.leftover;
+    showToast("Filled in what we could read — please check");
+  }catch(err){
+    console.error(err);
+    showToast("Couldn't read card text — fill in manually");
+  }finally{
+    $("ocrStatus").classList.add("hidden");
+  }
+}
 /* ============ Rendering ============ */
 function renderList(){
-  const q = $("searchInput").value.trim().toLowerCase
+  const q = $("searchInput").value.trim().toLowerCase();
+  const wrap = $("listWrap");
+  let list = contacts.slice();
+  if(q){
+    list = list.filter(c =>
+      (c.name||"").toLowerCase().includes(q) ||
+      (c.org||"").toLowerCase().includes(q) ||
+      (c.project||"").toLowerCase().includes(q)
+    );
+  }
+  /* alphabetical by name */
+  list.sort((a,b) => (a.name||"").localeCompare(b.name||"", undefined, {sensitivity:"base", numeric:true}));
+
+  if(!list.length){
+    wrap.innerHTML = `<div class="empty-state">
+      <h2>${contacts.length ? "No matches" : "No cards yet"}</h2>
+      <p>${contacts.length ? "Try a different name, company or project." : "Tap “Scan card” below and point your camera at a business card."}</p>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(c => {
+    const le = lastEntry(c);
+    const lastIso = le ? le.date : (c.createdAt ? c.createdAt.slice(0,10) : "");
+    const f = freshness(lastIso);
+    const thumb = c.thumb
+      ? `<img class="thumb" src="${c.thumb}" alt="">`
+      : `<div class="thumb placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M15 10h4M15 14h4"/></svg></div>`;
+    const phone = safePhone(c.phone);
+    const wa = phone ? phone.replace(/^\+/, "") : "";
+    const email = (c.email||"").trim();
+    return `<div class="row-wrap ${f.cls}">
+      <div class="row" data-id="${c.id}">
+        ${thumb}
+        <div class="row-main">
+          <div class="row-name">${escapeHtml(c.name || "Unnamed")}</div>
+          <div class="row-org">${escapeHtml(c.org || "—")}</div>
+          ${c.project ? `<div class="row-project">${escapeHtml(c.project)}</div>` : ""}
+        </div>
+        <div class="row-last">
+          <div class="type ${f.cls}">${le ? escapeHtml(le.type) : "Added"}</div>
+          <div class="date">${fmtDate(lastIso)}</div>
+          <div class="age">${f.label}</div>
+        </div>
+      </div>
+      <div class="row-icons">
+        ${phone ? `<a class="mini-btn pine" href="tel:${phone}" title="Call" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.7a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6a2 2 0 011.9 2z"/></svg></a>` : ""}
+        ${wa ? `<a class="mini-btn pine" href="https://wa.me/${wa}" target="_blank" rel="noopener" title="WhatsApp" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-12.5 7.4L3 21l2.1-5.4A8.5 8.5 0 1121 11.5z"/></svg></a>` : ""}
+        ${email ? `<a class="mini-btn" href="mailto:${escapeHtml(email)}" title="Email" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></a>` : ""}
+        <button class="mini-btn" data-act="follow" data-id="${c.id}" title="Quick follow-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+        <button class="mini-btn" data-act="edit" data-id="${c.id}" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="mini-btn rust" data-act="delete" data-id="${c.id}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ============ Sheets ============ */
+function openSheet(id){ $("backdrop").classList.add("open"); $(id).classList.add("open"); }
+function closeSheets(){
+  $("backdrop").classList.remove("open");
+  ["editSheet","detailSheet","settingsSheet"].forEach(id => $(id).classList.remove("open"));
+  activeId = null;
+}
+$("backdrop").addEventListener("click", closeSheets);
+
+/* ============ Add / Edit form ============ */
+function resetEditForm(){
+  ["fName","fOrg","fProject","fPhone","fEmail","fNotes","fNextFollow"].forEach(id => $(id).value = "");
+  $("fType").value = "Met";
+  $("fDate").value = todayStr();
+  pendingPhoto = { thumb:null, image:null };
+  $("editPhotoPreview").classList.add("hidden");
+  $("editPhotoPreview").removeAttribute("src");
+  $("ocrStatus").classList.add("hidden");
+  $("editTitle").textContent = "New contact";
+  activeId = null;
+}
+
+function openEditContact(id){
+  const c = contacts.find(x => x.id === id);
+  if(!c) return;
+  activeId = id;
+  $("editTitle").textContent = "Edit contact";
+  $("fName").value = c.name || "";
+  $("fOrg").value = c.org || "";
+  $("fProject").value = c.project || "";
+  $("fPhone").value = c.phone || "";
+  $("fEmail").value = c.email || "";
+  $("fNotes").value = c.notes || "";
+  $("fNextFollow").value = c.nextFollow || "";
+  $("fDate").value = todayStr();
+  $("fType").value = "Follow-up";
+  pendingPhoto = { thumb: c.thumb || null, image: c.image || null };
+  if(c.image){
+    $("editPhotoPreview").src = c.image;
+    $("editPhotoPreview").classList.remove("hidden");
+  } else {
+    $("editPhotoPreview").classList.add("hidden");
+    $("editPhotoPreview").removeAttribute("src");
+  }
+  $("ocrStatus").classList.add("hidden");
+  openSheet("editSheet");
+}
+
+$("scanBtn").addEventListener("click", () => { resetEditForm(); $("cameraInput").click(); });
+$("addBtn").addEventListener("click", () => { resetEditForm(); openSheet("editSheet"); });
+$("editCameraBtn").addEventListener("click", () => $("cameraInput").click());
+$("editGalleryBtn").addEventListener("click", () => $("galleryInput").click());
+$("editClose").addEventListener("click", closeSheets);
+
+async function handleNewImage(file){
+  const { thumb, image } = await processImageFile(file);
+  pendingPhoto = { thumb, image };
+  $("editPhotoPreview").src = image;
+  $("editPhotoPreview").classList.remove("hidden");
+  openSheet("editSheet");
+  runOCRAndFill(file);
+}
+$("cameraInput").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if(f) await handleNewImage(f);
+});
+$("galleryInput").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if(f) await handleNewImage(f);
+});
+
+/* single save handler — works for both Add and Edit */
+$("saveBtn").addEventListener("click", async () => {
+  const name = $("fName").value.trim();
+  if(!name){ showToast("Add a name before saving"); return; }
+
+  const entry = {
+    name,
+    org: $("fOrg").value.trim(),
+    project: $("fProject").value.trim(),
+    phone: $("fPhone").value.trim(),
+    email: $("fEmail").value.trim(),
+    notes: $("fNotes").value.trim(),
+    nextFollow: $("fNextFollow").value || ""
+  };
+  const logEntry = {
+    type: $("fType").value,
+    date: $("fDate").value || todayStr(),
+    note: activeId ? "Updated details" : ""
+  };
+
+  if(activeId){
+    const c = contacts.find(x => x.id === activeId);
+    if(!c) return;
+    Object.assign(c, entry);
+    if(pendingPhoto.thumb) c.thumb = pendingPhoto.thumb;
+    if(pendingPhoto.image) c.image = pendingPhoto.image;
+    c.history = c.history || [];
+    c.history.push(logEntry);
+    c.updatedAt = new Date().toISOString();
+    await put("contacts", c);
+    showToast("Contact updated");
+  } else {
+    const now = new Date().toISOString();
+    const contact = {
+      id: uid(),
+      ...entry,
+      thumb: pendingPhoto.thumb,
+      image: pendingPhoto.image,
+      history: [logEntry],
+      createdAt: now,
+      updatedAt: now
+    };
+    await put("contacts", contact);
+    contacts.push(contact);
+    showToast("Contact saved");
+  }
+  renderList();
+  closeSheets();
+});
+
+/* ============ Detail view ============ */
+function openDetail(id){
+  const c = contacts.find(x => x.id === id);
+  if(!c) return;
+  activeId = id;
+  $("detailName").textContent = c.name || "Unnamed";
+  $("dName").value = c.name || "";
+  $("dOrg").value = c.org || "";
+  $("dProject").value = c.project || "";
+  $("dPhone").value = c.phone || "";
+  $("dEmail").value = c.email || "";
+  $("dNotes").value = c.notes || "";
+  $("dNextFollow").value = c.nextFollow || "";
+  $("dLogDate").value = todayStr();
+  $("dLogNote").value = "";
+  if(c.image){
+    $("detailPhoto").src = c.image;
+    $("detailPhoto").classList.remove("hidden");
+  } else {
+    $("detailPhoto").classList.add("hidden");
+    $("detailPhoto").removeAttribute("src");
+  }
+  const phone = safePhone(c.phone);
+  $("dCallBtn").href = phone ? "tel:" + phone : "#";
+  $("dWaBtn").href = phone ? "https://wa.me/" + phone.replace(/^\+/, "") : "#";
+  renderHistory(c);
+  openSheet("detailSheet");
+}
+
+function renderHistory(c){
+  const items = (c.history||[]).slice().sort((a,b)=> a.date < b.date ? 1 : -1);
+  $("dHistory").innerHTML = items.map(h => `
+    <div class="history-item">
+      <div>
+        <span class="h-type">${escapeHtml(h.type)}</span>
+        ${h.note ? `<span class="h-note">${escapeHtml(h.note)}</span>` : ""}
+      </div>
+      <div class="h-date">${fmtDate(h.date)}</div>
+    </div>`).join("") || `<div class="settings-note">No interactions logged yet.</div>`;
+}
+$("detailClose").addEventListener("click", closeSheets);
+
+$("dSaveBtn").addEventListener("click", async () => {
+  const c = contacts.find(x => x.id === activeId);
+  if(!c) return;
+  c.name = $("dName").value.trim() || c.name;
+  c.org = $("dOrg").value.trim();
+  c.project = $("dProject").value.trim();
+  c.phone = $("dPhone").value.trim();
+  c.email = $("dEmail").value.trim();
+  c.notes = $("dNotes").value.trim();
+  c.nextFollow = $("dNextFollow").value || "";
+  c.updatedAt = new Date().toISOString();
+  await put("contacts", c);
+  $("detailName").textContent = c.name;
+  renderList();
+  showToast("Changes saved");
+});
+
+$("dLogAdd").addEventListener("click", async () => {
+  const c = contacts.find(x => x.id === activeId);
+  if(!c) return;
+  c.history = c.history || [];
+  c.history.push({
+    type: $("dLogType").value,
+    date: $("dLogDate").value || todayStr(),
+    note: $("dLogNote").value.trim()
+  });
+  c.updatedAt = new Date().toISOString();
+  await put("contacts", c);
+  renderHistory(c);
+  renderList();
+  $("dLogNote").value = "";
+  showToast("Interaction logged");
+});
+
+$("dRetakeBtn").addEventListener("click", () => $("retakeInput").click());
+$("retakeInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0]; e.target.value = "";
+  if(!file || !activeId) return;
+  const { thumb, image } = await processImageFile(file);
+  const c = contacts.find(x => x.id === activeId);
+  if(!c) return;
+  c.thumb = thumb; c.image = image; c.updatedAt = new Date().toISOString();
+  await put("contacts", c);
+  $("detailPhoto").src = image;
+  $("detailPhoto").classList.remove("hidden");
+  renderList();
+  showToast("Photo updated");
+});
+
+$("dDeleteBtn").addEventListener("click", async () => {
+  if(!activeId) return;
+  if(!confirm("Delete this contact? This can't be undone.")) return;
+  await del("contacts", activeId);
+  contacts = contacts.filter(c => c.id !== activeId);
+  renderList();
+  closeSheets();
+  showToast("Contact deleted");
+});
+
+/* ============ Row clicks + mini action buttons ============ */
+$("listWrap").addEventListener("click", async (e) => {
+  const actionBtn = e.target.closest("[data-act]");
+  if(actionBtn){
+    e.stopPropagation();
+    const id = actionBtn.dataset.id;
+    const act = actionBtn.dataset.act;
+    if(act === "delete"){
+      if(!confirm("Delete this contact? This can't be undone.")) return;
+      await del("contacts", id);
+      contacts = contacts.filter(c => c.id !== id);
+      renderList();
+      showToast("Contact deleted");
+    } else if(act === "edit"){
+      openEditContact(id);
+    } else if(act === "follow"){
+      const c = contacts.find(x => x.id === id);
+      if(!c) return;
+      c.history = c.history || [];
+      c.history.push({ type:"Follow-up", date: todayStr(), note: "Quick follow-up" });
+      c.updatedAt = new Date().toISOString();
+      await put("contacts", c);
+      renderList();
+      showToast("Follow-up logged");
+    }
+    return;
+  }
+  const row = e.target.closest(".row");
+  if(row) openDetail(row.dataset.id);
+});
+
+/* ============ Search ============ */
+$("searchInput").addEventListener("input", renderList);
+
+/* ============ Settings / backup / restore ============ */
+$("settingsBtn").addEventListener("click", () => openSheet("settingsSheet"));
+$("settingsClose").addEventListener("click", closeSheets);
+
+$("backupBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), contacts }, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `card-ledger-backup-${todayStr()}.json`;
+  a.click();
+  showToast("Backup downloaded");
+});
+
+$("restoreBtn").addEventListener("click", () => $("restoreInput").click());
+$("restoreInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  try{
+    const data = JSON.parse(await file.text());
+    const incoming = Array.isArray(data.contacts) ? data.contacts : data;
+    if(!Array.isArray(incoming)) throw new Error("bad format");
+    let added = 0;
+    for(const c of incoming){
+      if(!c.id) c.id = uid();
+      const existing = contacts.find(x => x.id === c.id);
+      if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
+        await put("contacts", c);
+        contacts = contacts.filter(x => x.id !== c.id);
+        contacts.push(c);
+        added++;
+      }
+    }
+    renderList();
+    showToast(`Restored ${added} contact(s)`);
+  }catch(err){
+    showToast("Couldn't read that backup file");
+  }
+});
+
+/* ============ Boot ============ */
+(async function init(){
+  try{
+    contacts = await getAll("contacts");
+  }catch(e){
+    contacts = [];
+  }
+  renderList();
+})();
+
+})();
+</script>
+</body>
+</html>
