@@ -598,10 +598,13 @@
     <div id="storageStatus" class="status-pill">Stored on this device only</div>
     <div class="section-label">Local backup</div>
     <div class="settings-note">Everything is saved on this device automatically (photos included). Use these buttons any time to make a portable copy.</div>
-    <div style="display:flex;gap:10px;margin-bottom:22px;">
-      <button class="btn outline" id="backupBtn">Download backup</button>
-      <button class="btn outline" id="restoreBtn">Restore backup</button>
-    </div>
+    <div style="display:flex;gap:10px;margin-bottom:10px;">
+  <button class="btn outline" id="backupBtn">Plain backup</button>
+  <button class="btn outline" id="restoreBtn">Restore</button>
+</div>
+<div style="display:flex;gap:10px;margin-bottom:22px;">
+  <button class="btn pine" id="backupBtnEncrypted">🔒 Encrypted backup</button>
+</div>
     <div class="section-label">Data safety</div>
     <div class="settings-note">
       All data lives in your browser's IndexedDB on this device only. Nothing is uploaded to any server unless you download a backup and store it yourself. Keep regular backups — clearing browser data will erase everything.
@@ -1105,7 +1108,128 @@ $("restoreInput").addEventListener("change", async (e) => {
   }
   renderList();
 })();
+/* ============ Encrypted backup (AES-GCM) ============ */
+async function deriveKey(password, salt){
+  const enc = new TextEncoder();
+  const baseKey = await crypto.subtle.importKey(
+    "raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name:"PBKDF2", salt, iterations: 150000, hash:"SHA-256" },
+    baseKey,
+    { name:"AES-GCM", length: 256 },
+    false,
+    ["encrypt","decrypt"]
+  );
+}
+function bufToB64(buf){
+  const bytes = new Uint8Array(buf);
+  let bin = "";
+  for(let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function b64ToBuf(b64){
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+async function encryptBackup(password){
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(password, salt);
+  const plaintext = enc.encode(JSON.stringify({ exportedAt: new Date().toISOString(), contacts }));
+  const ciphertext = await crypto.subtle.encrypt({ name:"AES-GCM", iv }, key, plaintext);
+  return {
+    format: "card-ledger-encrypted",
+    version: 1,
+    salt: bufToB64(salt),
+    iv: bufToB64(iv),
+    data: bufToB64(ciphertext)
+  };
+}
+async function decryptBackup(bundle, password){
+  if(!bundle || bundle.format !== "card-ledger-encrypted") throw new Error("not encrypted");
+  const salt = b64ToBuf(bundle.salt);
+  const iv = b64ToBuf(bundle.iv);
+  const data = b64ToBuf(bundle.data);
+  const key = await deriveKey(password, salt);
+  const plaintext = await crypto.subtle.decrypt({ name:"AES-GCM", iv }, key, data);
+  return JSON.parse(new TextDecoder().decode(plaintext));
+}
 
+/* Encrypted download button */
+$("backupBtnEncrypted") && $("backupBtnEncrypted").addEventListener("click", async () => {
+  if(!contacts.length){ showToast("No contacts to back up"); return; }
+  const pwd = prompt("Choose a password for this backup.\nYou'll need it to restore. There is NO recovery if you forget it.");
+  if(!pwd || pwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
+  const confirm2 = prompt("Type the same password again to confirm:");
+  if(confirm2 !== pwd){ showToast("Passwords didn't match"); return; }
+  try{
+    const bundle = await encryptBackup(pwd);
+    const blob = new Blob([JSON.stringify(bundle, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `card-ledger-encrypted-${todayStr()}.json`;
+    a.click();
+    showToast("Encrypted backup downloaded");
+  }catch(err){
+    console.error(err);
+    showToast("Encryption failed — try again");
+  }
+});
+
+/* Hook into the existing restore input: detect encrypted vs plain */
+(async function wrapRestore(){
+  const input = $("restoreInput");
+  if(!input) return;
+  // clone the input to strip the old change handler, then re-add ours
+  const fresh = input.cloneNode(true);
+  input.parentNode.replaceChild(fresh, input);
+  fresh.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if(!file) return;
+    let parsed;
+    try{
+      parsed = JSON.parse(await file.text());
+    }catch(err){
+      showToast("Couldn't read that file");
+      return;
+    }
+    if(parsed && parsed.format === "card-ledger-encrypted"){
+      const pwd = prompt("This is an encrypted backup.\nEnter the password you set when creating it:");
+      if(!pwd){ showToast("Restore cancelled"); return; }
+      try{
+        const dec = await decryptBackup(parsed, pwd);
+        await mergeRestored(dec.contacts || []);
+      }catch(err){
+        showToast("Wrong password or corrupted file");
+      }
+    } else {
+      const incoming = Array.isArray(parsed.contacts) ? parsed.contacts : parsed;
+      if(!Array.isArray(incoming)){ showToast("Backup format not recognized"); return; }
+      await mergeRestored(incoming);
+    }
+  });
+})();
+
+async function mergeRestored(incoming){
+  let added = 0;
+  for(const c of incoming){
+    if(!c.id) c.id = uid();
+    const existing = contacts.find(x => x.id === c.id);
+    if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
+      await put("contacts", c);
+      contacts = contacts.filter(x => x.id !== c.id);
+      contacts.push(c);
+      added++;
+    }
+  }
+  renderList();
+  showToast(`Restored ${added} contact(s)`);
+}  
 })();
 </script>
 </body>
