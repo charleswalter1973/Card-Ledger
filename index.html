@@ -19,8 +19,7 @@
     --pine:#2F5D50;
     --rust:#A23E33;
     --line:#DCDFE4;
-    --shadow: 0 1px 0 rgba(22,33,62,0.04);
-    --radius: 10px;
+    --radius:10px;
     --fresh-green:#2E7D32;
     --fresh-blue:#1565C0;
     --fresh-yellow:#C9A227;
@@ -45,7 +44,6 @@
     position:relative;
   }
 
-  /* ---------- Header ---------- */
   header.top{
     background:var(--ink);
     color:#fff;
@@ -84,10 +82,7 @@
     cursor:pointer;
   }
   .icon-btn svg{width:18px;height:18px;}
-  .search-wrap{
-    margin-top:14px;
-    position:relative;
-  }
+  .search-wrap{margin-top:14px;position:relative;}
   .search-wrap svg{
     position:absolute;
     left:13px;top:50%;transform:translateY(-50%);
@@ -105,6 +100,7 @@
     color:var(--ink);
   }
   .search-wrap input:focus{outline:2px solid var(--brass);outline-offset:1px;}
+
   .col-labels{
     display:flex;
     padding:12px 18px 8px;
@@ -117,8 +113,8 @@
   .col-labels .c2{flex:1;}
   .col-labels .c3{width:110px;flex-shrink:0;text-align:right;}
 
-  /* ---------- List ---------- */
   main{flex:1;overflow-y:auto;padding-bottom:96px;}
+
   .row-wrap{
     background:var(--surface);
     border-bottom:1px solid var(--line);
@@ -128,6 +124,7 @@
   .row-wrap.fresh-blue{border-left-color:var(--fresh-blue);}
   .row-wrap.fresh-yellow{border-left-color:var(--fresh-yellow);}
   .row-wrap.fresh-orange{border-left-color:var(--fresh-orange);}
+
   .row{
     display:flex;
     align-items:center;
@@ -136,6 +133,7 @@
     cursor:pointer;
   }
   .row:active{background:#F5F3EE;}
+
   .thumb{
     width:50px;height:36px;
     border-radius:3px;
@@ -152,6 +150,7 @@
     transform:none;
   }
   .thumb.placeholder svg{width:16px;height:16px;}
+
   .row-main{flex:1;min-width:0;}
   .row-name{
     font-family:'Fraunces',serif;
@@ -172,23 +171,13 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     margin-top:1px;
   }
-  .row-last{
-    width:110px;flex-shrink:0;text-align:right;
-  }
-  .row-last .type{
-    font-size:0.72rem;
-    font-weight:600;
-  }
+  .row-last{width:110px;flex-shrink:0;text-align:right;}
+  .row-last .type{font-size:0.72rem;font-weight:600;}
   .row-last .date{
-    font-size:0.82rem;
-    font-weight:700;
-    color:var(--ink);
-    margin-top:1px;
+    font-size:0.82rem;font-weight:700;color:var(--ink);margin-top:1px;
   }
   .row-last .age{
-    font-size:0.68rem;
-    color:var(--ink-soft);
-    margin-top:1px;
+    font-size:0.68rem;color:var(--ink-soft);margin-top:1px;
   }
   .type.fresh-green{color:var(--fresh-green);}
   .type.fresh-blue{color:var(--fresh-blue);}
@@ -231,7 +220,7 @@
     margin-bottom:6px;
   }
   .empty-state p{font-size:0.9rem;line-height:1.5;}
-  /* ---------- Bottom action bar ---------- */
+
   .action-bar{
     position:fixed;
     bottom:0;left:0;right:0;
@@ -263,8 +252,8 @@
   .btn.pine{background:var(--pine);color:#fff;}
   .btn.rust{background:transparent;color:var(--rust);border:1.5px solid var(--rust);}
   .btn.block{width:100%;}
+  .btn:disabled{opacity:0.6;cursor:not-allowed;}
 
-  /* ---------- Sheets / modals ---------- */
   .sheet-backdrop{
     position:fixed;inset:0;
     background:rgba(22,33,62,0.45);
@@ -272,6 +261,7 @@
     display:none;
   }
   .sheet-backdrop.open{display:block;}
+
   .sheet{
     position:fixed;
     left:0;right:0;bottom:0;
@@ -306,6 +296,7 @@
     padding:16px 18px 28px;
     overflow-y:auto;
   }
+
   .card-photo{
     width:100%;
     max-height:220px;
@@ -314,6 +305,7 @@
     border-radius:10px;
     margin-bottom:16px;
   }
+
   .field{margin-bottom:14px;}
   .field label{
     display:block;
@@ -336,11 +328,7 @@
   .field-row{display:flex;gap:10px;}
   .field-row .field{flex:1;}
 
-  .photo-btn-row{
-    display:flex;
-    gap:8px;
-    margin-bottom:14px;
-  }
+  .photo-btn-row{display:flex;gap:8px;margin-bottom:14px;}
   .photo-btn-row .btn{flex:1;font-size:0.82rem;padding:11px 8px;}
 
   .history-item{
@@ -361,9 +349,7 @@
     font-size:0.98rem;
     margin:18px 0 8px;
   }
-  .log-form{
-    display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;
-  }
+  .log-form{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
   .log-form select, .log-form input{
     padding:9px;
     border:1.5px solid var(--line);
@@ -395,6 +381,7 @@
     margin-bottom:12px;
   }
   .hidden{display:none !important;}
+
   .toast{
     position:fixed;
     bottom:100px;left:50%;transform:translateX(-50%);
@@ -426,6 +413,29 @@
   .legend .dot.b{background:var(--fresh-blue);}
   .legend .dot.y{background:var(--fresh-yellow);}
   .legend .dot.o{background:var(--fresh-orange);}
+
+  .backup-banner{
+    position:fixed;
+    top:0;left:0;right:0;
+    background:var(--brass);
+    color:#fff;
+    padding:10px 14px;
+    font-size:0.8rem;
+    z-index:2000;
+    text-align:center;
+    font-family:'Inter',sans-serif;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  }
+  .backup-banner button{
+    margin-left:10px;
+    background:transparent;
+    border:1px solid #fff;
+    color:#fff;
+    border-radius:6px;
+    padding:3px 10px;
+    font-size:0.75rem;
+    cursor:pointer;
+  }
 </style>
 </head>
 <body>
@@ -472,6 +482,7 @@
     </button>
   </div>
 </div>
+
 <input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
 <input type="file" accept="image/*" id="galleryInput" class="hidden">
 <input type="file" accept="image/*" id="retakeInput" class="hidden">
@@ -599,12 +610,12 @@
     <div class="section-label">Local backup</div>
     <div class="settings-note">Everything is saved on this device automatically (photos included). Use these buttons any time to make a portable copy.</div>
     <div style="display:flex;gap:10px;margin-bottom:10px;">
-  <button class="btn outline" id="backupBtn">Plain backup</button>
-  <button class="btn outline" id="restoreBtn">Restore</button>
-</div>
-<div style="display:flex;gap:10px;margin-bottom:22px;">
-  <button class="btn pine" id="backupBtnEncrypted">🔒 Encrypted backup</button>
-</div>
+      <button class="btn outline" id="backupBtn">Plain backup</button>
+      <button class="btn outline" id="restoreBtn">Restore</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:22px;">
+      <button class="btn pine" id="backupBtnEncrypted">🔒 Encrypted backup</button>
+    </div>
     <div class="section-label">Data safety</div>
     <div class="settings-note">
       All data lives in your browser's IndexedDB on this device only. Nothing is uploaded to any server unless you download a backup and store it yourself. Keep regular backups — clearing browser data will erase everything.
@@ -640,8 +651,10 @@ function setSetting(key, value){ return put("settings", {key, value}); }
 
 /* ============ State ============ */
 let contacts = [];
-let activeId = null;
+let activeEditId = null;
+let activeDetailId = null;
 let pendingPhoto = { thumb:null, image:null };
+let saveBusy = false;
 
 const $ = (id) => document.getElementById(id);
 const todayStr = () => new Date().toISOString().slice(0,10);
@@ -744,6 +757,7 @@ async function runOCRAndFill(file){
     $("ocrStatus").classList.add("hidden");
   }
 }
+
 /* ============ Rendering ============ */
 function renderList(){
   const q = $("searchInput").value.trim().toLowerCase();
@@ -756,7 +770,6 @@ function renderList(){
       (c.project||"").toLowerCase().includes(q)
     );
   }
-  /* alphabetical by name */
   list.sort((a,b) => (a.name||"").localeCompare(b.name||"", undefined, {sensitivity:"base", numeric:true}));
 
   if(!list.length){
@@ -771,6 +784,7 @@ function renderList(){
     const le = lastEntry(c);
     const lastIso = le ? le.date : (c.createdAt ? c.createdAt.slice(0,10) : "");
     const f = freshness(lastIso);
+    const safeId = escapeHtml(c.id);
     const thumb = c.thumb
       ? `<img class="thumb" src="${c.thumb}" alt="">`
       : `<div class="thumb placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M15 10h4M15 14h4"/></svg></div>`;
@@ -778,7 +792,7 @@ function renderList(){
     const wa = phone ? phone.replace(/^\+/, "") : "";
     const email = (c.email||"").trim();
     return `<div class="row-wrap ${f.cls}">
-      <div class="row" data-id="${c.id}">
+      <div class="row" data-id="${safeId}">
         ${thumb}
         <div class="row-main">
           <div class="row-name">${escapeHtml(c.name || "Unnamed")}</div>
@@ -795,9 +809,9 @@ function renderList(){
         ${phone ? `<a class="mini-btn pine" href="tel:${phone}" title="Call" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.7a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6a2 2 0 011.9 2z"/></svg></a>` : ""}
         ${wa ? `<a class="mini-btn pine" href="https://wa.me/${wa}" target="_blank" rel="noopener" title="WhatsApp" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-12.5 7.4L3 21l2.1-5.4A8.5 8.5 0 1121 11.5z"/></svg></a>` : ""}
         ${email ? `<a class="mini-btn" href="mailto:${escapeHtml(email)}" title="Email" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></a>` : ""}
-        <button class="mini-btn" data-act="follow" data-id="${c.id}" title="Quick follow-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
-        <button class="mini-btn" data-act="edit" data-id="${c.id}" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
-        <button class="mini-btn rust" data-act="delete" data-id="${c.id}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
+        <button class="mini-btn" data-act="follow" data-id="${safeId}" title="Quick follow-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+        <button class="mini-btn" data-act="edit" data-id="${safeId}" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="mini-btn rust" data-act="delete" data-id="${safeId}" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
       </div>
     </div>`;
   }).join("");
@@ -808,7 +822,8 @@ function openSheet(id){ $("backdrop").classList.add("open"); $(id).classList.add
 function closeSheets(){
   $("backdrop").classList.remove("open");
   ["editSheet","detailSheet","settingsSheet"].forEach(id => $(id).classList.remove("open"));
-  activeId = null;
+  activeEditId = null;
+  activeDetailId = null;
 }
 $("backdrop").addEventListener("click", closeSheets);
 
@@ -822,13 +837,13 @@ function resetEditForm(){
   $("editPhotoPreview").removeAttribute("src");
   $("ocrStatus").classList.add("hidden");
   $("editTitle").textContent = "New contact";
-  activeId = null;
+  activeEditId = null;
 }
 
 function openEditContact(id){
   const c = contacts.find(x => x.id === id);
   if(!c) return;
-  activeId = id;
+  activeEditId = id;
   $("editTitle").textContent = "Edit contact";
   $("fName").value = c.name || "";
   $("fOrg").value = c.org || "";
@@ -874,61 +889,77 @@ $("galleryInput").addEventListener("change", async (e) => {
   if(f) await handleNewImage(f);
 });
 
-/* single save handler — works for both Add and Edit */
+/* Save handler with duplicate guard */
 $("saveBtn").addEventListener("click", async () => {
+  if(saveBusy) return;
   const name = $("fName").value.trim();
   if(!name){ showToast("Add a name before saving"); return; }
 
-  const entry = {
-    name,
-    org: $("fOrg").value.trim(),
-    project: $("fProject").value.trim(),
-    phone: $("fPhone").value.trim(),
-    email: $("fEmail").value.trim(),
-    notes: $("fNotes").value.trim(),
-    nextFollow: $("fNextFollow").value || ""
-  };
-  const logEntry = {
-    type: $("fType").value,
-    date: $("fDate").value || todayStr(),
-    note: activeId ? "Updated details" : ""
-  };
+  saveBusy = true;
+  const btn = $("saveBtn");
+  const oldLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Saving…";
 
-  if(activeId){
-    const c = contacts.find(x => x.id === activeId);
-    if(!c) return;
-    Object.assign(c, entry);
-    if(pendingPhoto.thumb) c.thumb = pendingPhoto.thumb;
-    if(pendingPhoto.image) c.image = pendingPhoto.image;
-    c.history = c.history || [];
-    c.history.push(logEntry);
-    c.updatedAt = new Date().toISOString();
-    await put("contacts", c);
-    showToast("Contact updated");
-  } else {
-    const now = new Date().toISOString();
-    const contact = {
-      id: uid(),
-      ...entry,
-      thumb: pendingPhoto.thumb,
-      image: pendingPhoto.image,
-      history: [logEntry],
-      createdAt: now,
-      updatedAt: now
+  try{
+    const entry = {
+      name,
+      org: $("fOrg").value.trim(),
+      project: $("fProject").value.trim(),
+      phone: $("fPhone").value.trim(),
+      email: $("fEmail").value.trim(),
+      notes: $("fNotes").value.trim(),
+      nextFollow: $("fNextFollow").value || ""
     };
-    await put("contacts", contact);
-    contacts.push(contact);
-    showToast("Contact saved");
+    const logEntry = {
+      type: $("fType").value,
+      date: $("fDate").value || todayStr(),
+      note: activeEditId ? "Updated details" : ""
+    };
+
+    if(activeEditId){
+      const c = contacts.find(x => x.id === activeEditId);
+      if(!c){ showToast("Contact not found"); return; }
+      Object.assign(c, entry);
+      if(pendingPhoto.thumb) c.thumb = pendingPhoto.thumb;
+      if(pendingPhoto.image) c.image = pendingPhoto.image;
+      c.history = c.history || [];
+      c.history.push(logEntry);
+      c.updatedAt = new Date().toISOString();
+      await put("contacts", c);
+      showToast("Contact updated");
+    } else {
+      const now = new Date().toISOString();
+      const contact = {
+        id: uid(),
+        ...entry,
+        thumb: pendingPhoto.thumb,
+        image: pendingPhoto.image,
+        history: [logEntry],
+        createdAt: now,
+        updatedAt: now
+      };
+      await put("contacts", contact);
+      contacts.push(contact);
+      showToast("Contact saved");
+    }
+    renderList();
+    closeSheets();
+  }catch(err){
+    console.error(err);
+    showToast("Could not save — storage may be full");
+  }finally{
+    saveBusy = false;
+    btn.disabled = false;
+    btn.textContent = oldLabel;
   }
-  renderList();
-  closeSheets();
 });
 
 /* ============ Detail view ============ */
 function openDetail(id){
   const c = contacts.find(x => x.id === id);
   if(!c) return;
-  activeId = id;
+  activeDetailId = id;
   $("detailName").textContent = c.name || "Unnamed";
   $("dName").value = c.name || "";
   $("dOrg").value = c.org || "";
@@ -967,7 +998,7 @@ function renderHistory(c){
 $("detailClose").addEventListener("click", closeSheets);
 
 $("dSaveBtn").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
+  const c = contacts.find(x => x.id === activeDetailId);
   if(!c) return;
   c.name = $("dName").value.trim() || c.name;
   c.org = $("dOrg").value.trim();
@@ -984,7 +1015,7 @@ $("dSaveBtn").addEventListener("click", async () => {
 });
 
 $("dLogAdd").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
+  const c = contacts.find(x => x.id === activeDetailId);
   if(!c) return;
   c.history = c.history || [];
   c.history.push({
@@ -1003,9 +1034,9 @@ $("dLogAdd").addEventListener("click", async () => {
 $("dRetakeBtn").addEventListener("click", () => $("retakeInput").click());
 $("retakeInput").addEventListener("change", async (e) => {
   const file = e.target.files[0]; e.target.value = "";
-  if(!file || !activeId) return;
+  if(!file || !activeDetailId) return;
   const { thumb, image } = await processImageFile(file);
-  const c = contacts.find(x => x.id === activeId);
+  const c = contacts.find(x => x.id === activeDetailId);
   if(!c) return;
   c.thumb = thumb; c.image = image; c.updatedAt = new Date().toISOString();
   await put("contacts", c);
@@ -1016,10 +1047,10 @@ $("retakeInput").addEventListener("change", async (e) => {
 });
 
 $("dDeleteBtn").addEventListener("click", async () => {
-  if(!activeId) return;
+  if(!activeDetailId) return;
   if(!confirm("Delete this contact? This can't be undone.")) return;
-  await del("contacts", activeId);
-  contacts = contacts.filter(c => c.id !== activeId);
+  await del("contacts", activeDetailId);
+  contacts = contacts.filter(c => c.id !== activeDetailId);
   renderList();
   closeSheets();
   showToast("Contact deleted");
@@ -1069,47 +1100,63 @@ $("backupBtn").addEventListener("click", async () => {
   a.href = URL.createObjectURL(blob);
   a.download = `card-ledger-backup-${todayStr()}.json`;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   await setSetting("lastBackupAt", Date.now());
   showToast("Backup downloaded");
 });
 
 $("restoreBtn").addEventListener("click", () => $("restoreInput").click());
+
 $("restoreInput").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   e.target.value = "";
   if(!file) return;
+
+  let parsed;
   try{
-    const data = JSON.parse(await file.text());
-    const incoming = Array.isArray(data.contacts) ? data.contacts : data;
-    if(!Array.isArray(incoming)) throw new Error("bad format");
-    let added = 0;
-    for(const c of incoming){
-      if(!c.id) c.id = uid();
-      const existing = contacts.find(x => x.id === c.id);
-      if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
-        await put("contacts", c);
-        contacts = contacts.filter(x => x.id !== c.id);
-        contacts.push(c);
-        added++;
-      }
-    }
-    renderList();
-    showToast(`Restored ${added} contact(s)`);
+    parsed = JSON.parse(await file.text());
   }catch(err){
-    showToast("Couldn't read that backup file");
+    showToast("Couldn't read that file");
+    return;
   }
+
+  if(parsed && parsed.format === "card-ledger-encrypted"){
+    const pwd = prompt("This is an encrypted backup.\nEnter the password you set when creating it:");
+    if(!pwd){ showToast("Restore cancelled"); return; }
+    try{
+      const dec = await decryptBackup(parsed, pwd);
+      await mergeRestored(dec.contacts || []);
+    }catch(err){
+      showToast("Wrong password or corrupted file");
+    }
+    return;
+  }
+
+  const incoming = Array.isArray(parsed.contacts) ? parsed.contacts : parsed;
+  if(!Array.isArray(incoming)){ showToast("Backup format not recognized"); return; }
+  await mergeRestored(incoming);
 });
 
-/* ============ Boot ============ */
-(async function init(){
-  try{
-    contacts = await getAll("contacts");
-  }catch(e){
-    contacts = [];
+async function mergeRestored(incoming){
+  if(incoming.length > 5000){
+    if(!confirm(`This backup contains ${incoming.length} contacts. Continue?`)) return;
+  }
+  let added = 0;
+  for(const c of incoming){
+    if(!c.id) c.id = uid();
+    const existing = contacts.find(x => x.id === c.id);
+    if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
+      await put("contacts", c);
+      contacts = contacts.filter(x => x.id !== c.id);
+      contacts.push(c);
+      added++;
+    }
   }
   renderList();
-})();
-/* ============ Encrypted backup (AES-GCM) ============ */
+  showToast(`Restored ${added} contact(s)`);
+}
+
+/* ============ Encrypted backup ============ */
 async function deriveKey(password, salt){
   const enc = new TextEncoder();
   const baseKey = await crypto.subtle.importKey(
@@ -1160,9 +1207,12 @@ async function decryptBackup(bundle, password){
   return JSON.parse(new TextDecoder().decode(plaintext));
 }
 
-/* Encrypted download button */
-$("backupBtnEncrypted") && $("backupBtnEncrypted").addEventListener("click", async () => {
+$("backupBtnEncrypted").addEventListener("click", async () => {
   if(!contacts.length){ showToast("No contacts to back up"); return; }
+  if(!crypto || !crypto.subtle){
+    showToast("Encryption needs HTTPS — open the site over https://");
+    return;
+  }
   const pwd = prompt("Choose a password for this backup.\nYou'll need it to restore. There is NO recovery if you forget it.");
   if(!pwd || pwd.length < 6){ showToast("Password must be at least 6 characters"); return; }
   const confirm2 = prompt("Type the same password again to confirm:");
@@ -1174,6 +1224,8 @@ $("backupBtnEncrypted") && $("backupBtnEncrypted").addEventListener("click", asy
     a.href = URL.createObjectURL(blob);
     a.download = `card-ledger-encrypted-${todayStr()}.json`;
     a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    await setSetting("lastBackupAt", Date.now());
     showToast("Encrypted backup downloaded");
   }catch(err){
     console.error(err);
@@ -1181,56 +1233,49 @@ $("backupBtnEncrypted") && $("backupBtnEncrypted").addEventListener("click", asy
   }
 });
 
-/* Hook into the existing restore input: detect encrypted vs plain */
-(async function wrapRestore(){
-  const input = $("restoreInput");
-  if(!input) return;
-  // clone the input to strip the old change handler, then re-add ours
-  const fresh = input.cloneNode(true);
-  input.parentNode.replaceChild(fresh, input);
-  fresh.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    e.target.value = "";
-    if(!file) return;
-    let parsed;
-    try{
-      parsed = JSON.parse(await file.text());
-    }catch(err){
-      showToast("Couldn't read that file");
-      return;
-    }
-    if(parsed && parsed.format === "card-ledger-encrypted"){
-      const pwd = prompt("This is an encrypted backup.\nEnter the password you set when creating it:");
-      if(!pwd){ showToast("Restore cancelled"); return; }
-      try{
-        const dec = await decryptBackup(parsed, pwd);
-        await mergeRestored(dec.contacts || []);
-      }catch(err){
-        showToast("Wrong password or corrupted file");
+/* ============ Weekly backup reminder ============ */
+(async function backupReminder(){
+  try{
+    const last = await getSetting("lastBackupAt", 0);
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    if(Date.now() - last < sevenDays) return;
+    if(!contacts.length) return;
+
+    const bar = document.createElement("div");
+    bar.className = "backup-banner";
+    bar.innerHTML = `<b>Backup reminder:</b> it's been over a week — tap to download a fresh copy.
+      <button id="reminderDismiss">Later</button>`;
+    document.body.appendChild(bar);
+
+    bar.addEventListener("click", async (e) => {
+      if(e.target.id === "reminderDismiss"){
+        await setSetting("lastBackupAt", Date.now());
+        bar.remove();
+        return;
       }
-    } else {
-      const incoming = Array.isArray(parsed.contacts) ? parsed.contacts : parsed;
-      if(!Array.isArray(incoming)){ showToast("Backup format not recognized"); return; }
-      await mergeRestored(incoming);
-    }
-  });
+      const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), contacts }, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `card-ledger-backup-${todayStr()}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      await setSetting("lastBackupAt", Date.now());
+      bar.remove();
+      showToast("Backup downloaded");
+    });
+  }catch(e){ /* silent */ }
 })();
 
-async function mergeRestored(incoming){
-  let added = 0;
-  for(const c of incoming){
-    if(!c.id) c.id = uid();
-    const existing = contacts.find(x => x.id === c.id);
-    if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
-      await put("contacts", c);
-      contacts = contacts.filter(x => x.id !== c.id);
-      contacts.push(c);
-      added++;
-    }
+/* ============ Boot ============ */
+(async function init(){
+  try{
+    contacts = await getAll("contacts");
+  }catch(e){
+    contacts = [];
   }
   renderList();
-  showToast(`Restored ${added} contact(s)`);
-}  
+})();
+
 })();
 </script>
 </body>
