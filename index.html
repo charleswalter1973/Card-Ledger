@@ -1063,12 +1063,13 @@ $("searchInput").addEventListener("input", renderList);
 $("settingsBtn").addEventListener("click", () => openSheet("settingsSheet"));
 $("settingsClose").addEventListener("click", closeSheets);
 
-$("backupBtn").addEventListener("click", () => {
+$("backupBtn").addEventListener("click", async () => {
   const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), contacts }, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `card-ledger-backup-${todayStr()}.json`;
   a.click();
+  await setSetting("lastBackupAt", Date.now());
   showToast("Backup downloaded");
 });
 
