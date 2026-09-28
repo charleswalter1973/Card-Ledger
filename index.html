@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root{
@@ -22,6 +21,11 @@
     --line:#DCDFE4;
     --shadow: 0 1px 0 rgba(22,33,62,0.04);
     --radius: 10px;
+    /* freshness colors */
+    --fresh-green:#2E7D32;
+    --fresh-blue:#1565C0;
+    --fresh-yellow:#C9A227;
+    --fresh-orange:#E65100;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -114,17 +118,25 @@
   }
   .col-labels .c1{width:50px;flex-shrink:0;}
   .col-labels .c2{flex:1;}
-  .col-labels .c3{width:96px;flex-shrink:0;text-align:right;}
+  .col-labels .c3{width:110px;flex-shrink:0;text-align:right;}
 
   /* ---------- List ---------- */
   main{flex:1;overflow-y:auto;padding-bottom:96px;}
+  .row-wrap{
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    border-left:4px solid transparent;
+  }
+  .row-wrap.fresh-green{border-left-color:var(--fresh-green);}
+  .row-wrap.fresh-blue{border-left-color:var(--fresh-blue);}
+  .row-wrap.fresh-yellow{border-left-color:var(--fresh-yellow);}
+  .row-wrap.fresh-orange{border-left-color:var(--fresh-orange);}
+
   .row{
     display:flex;
     align-items:center;
     gap:12px;
-    padding:12px 18px;
-    border-bottom:1px solid var(--line);
-    background:var(--surface);
+    padding:12px 18px 8px;
     cursor:pointer;
   }
   .row:active{background:#F5F3EE;}
@@ -165,11 +177,10 @@
     margin-top:1px;
   }
   .row-last{
-    width:96px;flex-shrink:0;text-align:right;
+    width:110px;flex-shrink:0;text-align:right;
   }
   .row-last .type{
     font-size:0.72rem;
-    color:var(--brass-dark);
     font-weight:600;
   }
   .row-last .date{
@@ -178,6 +189,40 @@
     color:var(--ink);
     margin-top:1px;
   }
+  .row-last .age{
+    font-size:0.68rem;
+    color:var(--ink-soft);
+    margin-top:1px;
+  }
+  .type.fresh-green{color:var(--fresh-green);}
+  .type.fresh-blue{color:var(--fresh-blue);}
+  .type.fresh-yellow{color:var(--fresh-yellow);}
+  .type.fresh-orange{color:var(--fresh-orange);}
+
+  /* row action icons */
+  .row-icons{
+    display:flex;
+    gap:6px;
+    padding:0 18px 10px 78px;
+    flex-wrap:wrap;
+  }
+  .mini-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:#EFF1F3;
+    border:1px solid var(--line);
+    color:var(--ink);
+    cursor:pointer;
+    text-decoration:none;
+    padding:0;
+  }
+  .mini-btn svg{width:14px;height:14px;}
+  .mini-btn:hover{background:#E1E4E8;}
+  .mini-btn.rust{background:#F6E3E0;color:var(--rust);border-color:#E8C4BE;}
+  .mini-btn.pine{background:#E4EDE9;color:var(--pine);border-color:#C7DDD5;}
 
   .empty-state{
     padding:60px 32px;
@@ -214,6 +259,7 @@
     font-size:0.9rem;
     border:none;
     cursor:pointer;
+    text-decoration:none;
   }
   .btn svg{width:17px;height:17px;}
   .btn.primary{background:var(--brass);color:#fff;}
@@ -296,6 +342,13 @@
   .field-row{display:flex;gap:10px;}
   .field-row .field{flex:1;}
 
+  .photo-btn-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .photo-btn-row .btn{flex:1;font-size:0.82rem;padding:11px 8px;}
+
   .history-item{
     display:flex;
     justify-content:space-between;
@@ -315,13 +368,15 @@
     margin:18px 0 8px;
   }
   .log-form{
-    display:flex;gap:8px;margin-bottom:10px;
+    display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;
   }
   .log-form select, .log-form input{
     padding:9px;
     border:1.5px solid var(--line);
     border-radius:7px;
     font-size:0.85rem;
+    flex:1;
+    min-width:80px;
   }
   .log-form button{
     background:var(--pine);color:#fff;border:none;border-radius:7px;
@@ -363,6 +418,23 @@
     text-align:center;
   }
   .toast.show{opacity:1;}
+
+  .legend{
+    display:flex;
+    gap:10px;
+    padding:8px 18px;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+    background:#F7F8F9;
+    flex-wrap:wrap;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:4px;}
+  .legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .legend .dot.g{background:var(--fresh-green);}
+  .legend .dot.b{background:var(--fresh-blue);}
+  .legend .dot.y{background:var(--fresh-yellow);}
+  .legend .dot.o{background:var(--fresh-orange);}
 </style>
 </head>
 <body>
@@ -372,9 +444,6 @@
     <div class="top-row">
       <div class="brand">Card Ledger<small>Every card you've collected, in one place</small></div>
       <div style="display:flex;gap:8px;">
-        <button class="icon-btn pine" id="syncBtn" title="Sync with Google Drive">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
-        </button>
         <button class="icon-btn" id="settingsBtn" title="Settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009.2 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9.2a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         </button>
@@ -385,6 +454,13 @@
       <input type="text" id="searchInput" placeholder="Search name, company or project…">
     </div>
   </header>
+
+  <div class="legend">
+    <span><i class="dot g"></i>0–7 days</span>
+    <span><i class="dot b"></i>8–30 days</span>
+    <span><i class="dot y"></i>31–90 days</span>
+    <span><i class="dot o"></i>90+ days</span>
+  </div>
 
   <div class="col-labels">
     <div class="c1">Card</div>
@@ -409,6 +485,7 @@
 </div>
 
 <input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
+<input type="file" accept="image/*" id="galleryInput" class="hidden">
 <input type="file" accept="image/*" id="retakeInput" class="hidden">
 <input type="file" accept="application/json" id="restoreInput" class="hidden">
 
@@ -420,14 +497,18 @@
   <div class="sheet-handle"></div>
   <div class="sheet-head">
     <div class="sheet-title" id="editTitle">New contact</div>
-    <button class="icon-btn outline-none" id="editClose" style="border:none;color:var(--ink);">
+    <button class="icon-btn" id="editClose" style="border:none;color:var(--ink);">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
   </div>
   <div class="sheet-body">
-    <img id="editPhotoPreview" class="card-photo hidden">
+    <img id="editPhotoPreview" class="card-photo hidden" alt="">
     <div id="ocrStatus" class="status-pill hidden">Reading text from the card…</div>
-    <button class="btn outline block" id="editRetakeBtn" style="margin-bottom:16px;">Add / retake card photo</button>
+
+    <div class="photo-btn-row">
+      <button class="btn outline" id="editCameraBtn">📷 Camera</button>
+      <button class="btn outline" id="editGalleryBtn">🖼️ Gallery</button>
+    </div>
 
     <div class="field">
       <label>Name</label>
@@ -460,6 +541,7 @@
           <option>Called</option>
           <option>Emailed</option>
           <option>Visited</option>
+          <option>Follow-up</option>
         </select>
       </div>
       <div class="field">
@@ -470,6 +552,10 @@
     <div class="field">
       <label>Notes</label>
       <textarea id="fNotes" placeholder="Anything worth remembering…"></textarea>
+    </div>
+    <div class="field">
+      <label>Next follow-up date (optional)</label>
+      <input type="date" id="fNextFollow">
     </div>
     <button class="btn primary block" id="saveBtn">Save contact</button>
   </div>
@@ -485,7 +571,7 @@
     </button>
   </div>
   <div class="sheet-body">
-    <img id="detailPhoto" class="card-photo hidden">
+    <img id="detailPhoto" class="card-photo hidden" alt="">
     <div class="field">
       <label>Name</label>
       <input type="text" id="dName">
@@ -506,15 +592,27 @@
       <label>Notes</label>
       <textarea id="dNotes"></textarea>
     </div>
+    <div class="field">
+      <label>Next follow-up date</label>
+      <input type="date" id="dNextFollow">
+    </div>
     <button class="btn outline block" id="dSaveBtn">Save changes</button>
+
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <a class="btn pine" id="dCallBtn" href="#">📞 Call</a>
+      <a class="btn pine" id="dWaBtn" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+    </div>
 
     <div class="section-label">Log a new interaction</div>
     <div class="log-form">
       <select id="dLogType">
-        <option>Contacted</option><option>Met</option><option>Called</option><option>Emailed</option><option>Visited</option>
+        <option>Contacted</option><option>Met</option><option>Called</option><option>Emailed</option><option>Visited</option><option>Follow-up</option>
       </select>
       <input type="date" id="dLogDate">
       <button id="dLogAdd">Add</button>
+    </div>
+    <div class="log-form">
+      <input type="text" id="dLogNote" placeholder="Note (optional)">
     </div>
 
     <div class="section-label">History</div>
@@ -531,7 +629,7 @@
 <div class="sheet" id="settingsSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-head">
-    <div class="sheet-title">Settings & sync</div>
+    <div class="sheet-title">Settings</div>
     <button class="icon-btn" id="settingsClose" style="border:none;color:var(--ink);">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
@@ -546,25 +644,10 @@
       <button class="btn outline" id="restoreBtn">Restore backup</button>
     </div>
 
-    <div class="section-label">Google Drive sync (optional)</div>
-    <div class="settings-note" id="driveNote">
-      This connects directly to <b>your</b> Google Drive using Google's own sign-in — no data passes through any other server.
-      <ol>
-        <li>In <b>Google Cloud Console</b>, create a project and an OAuth Client ID (type: Web application).</li>
-        <li>Add the exact address this page is hosted at to <b>Authorized JavaScript origins</b>.</li>
-        <li>Paste that Client ID below and tap Connect.</li>
-      </ol>
-      <span id="fileProtocolWarn" class="hidden" style="color:var(--rust);display:block;margin-top:8px;">
-        <b>This copy is open as a local file</b>, and Google does not allow sign-in from local files. Host this page (for example on GitHub Pages) and open it from that address to use Drive sync.
-      </span>
+    <div class="section-label">Data safety</div>
+    <div class="settings-note">
+      All data lives in your browser's IndexedDB on this device only. Nothing is uploaded to any server unless you download a backup and store it yourself. Keep regular backups — clearing browser data will erase everything.
     </div>
-    <div class="field">
-      <label>Google OAuth Client ID</label>
-      <input type="text" id="clientIdInput" placeholder="xxxxx.apps.googleusercontent.com">
-    </div>
-    <button class="btn pine block" id="connectDriveBtn" style="margin-bottom:10px;">Connect & sync now</button>
-    <button class="btn outline block" id="disconnectDriveBtn">Disconnect Drive</button>
-    <div id="lastSyncNote" class="settings-note hidden" style="margin-top:14px;"></div>
   </div>
 </div>
 
@@ -621,7 +704,24 @@ function lastEntry(c){
 function fmtDate(iso){
   if(!iso) return "—";
   const d = new Date(iso + "T00:00:00");
+  if(isNaN(d)) return "—";
   return d.toLocaleDateString(undefined, {month:"short", day:"2-digit", year:"numeric"});
+}
+
+function daysBetween(isoA, isoB){
+  const a = new Date(isoA + "T00:00:00");
+  const b = new Date(isoB + "T00:00:00");
+  return Math.round((b - a) / 86400000);
+}
+
+/* freshness bucket based on last contact */
+function freshness(iso){
+  if(!iso) return { cls:"fresh-orange", label:"Never" };
+  const days = daysBetween(iso, todayStr());
+  if(days <= 7) return { cls:"fresh-green", label: days <= 0 ? "Today" : days + "d ago" };
+  if(days <= 30) return { cls:"fresh-blue", label: days + "d ago" };
+  if(days <= 90) return { cls:"fresh-yellow", label: days + "d ago" };
+  return { cls:"fresh-orange", label: days + "d ago" };
 }
 
 /* ============ Image capture / resize ============ */
@@ -647,443 +747,15 @@ async function processImageFile(file){
   return { thumb: resize(img, 320), image: resize(img, 1280) };
 }
 
+/* ============ Safe HTML ============ */
+function escapeHtml(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+function safePhone(p){ return String(p || "").replace(/[^\d+]/g, ""); }
+function safeEmail(e){ return String(e || "").trim(); }
+
 /* ============ Rendering ============ */
 function renderList(){
-  const q = $("searchInput").value.trim().toLowerCase();
-  const wrap = $("listWrap");
-  let list = contacts.slice();
-  if(q){
-    list = list.filter(c =>
-      (c.name||"").toLowerCase().includes(q) ||
-      (c.org||"").toLowerCase().includes(q) ||
-      (c.project||"").toLowerCase().includes(q)
-    );
-  }
-  list.sort((a,b)=>{
-    const la = lastEntry(a), lb = lastEntry(b);
-    const da = la ? la.date : a.createdAt.slice(0,10);
-    const db_ = lb ? lb.date : b.createdAt.slice(0,10);
-    return da < db_ ? 1 : -1;
-  });
-
-  if(!list.length){
-    wrap.innerHTML = `<div class="empty-state">
-      <h2>${contacts.length ? "No matches" : "No cards yet"}</h2>
-      <p>${contacts.length ? "Try a different name, company or project." : "Tap “Scan card” below and point your camera at a business card to add your first contact."}</p>
-    </div>`;
-    return;
-  }
-
-  wrap.innerHTML = list.map(c => {
-    const le = lastEntry(c);
-    const thumb = c.thumb
-      ? `<img class="thumb" src="${c.thumb}" alt="">`
-      : `<div class="thumb placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M15 10h4M15 14h4"/></svg></div>`;
-    return `<div class="row" data-id="${c.id}">
-      ${thumb}
-      <div class="row-main">
-        <div class="row-name">${escapeHtml(c.name || "Unnamed")}</div>
-        <div class="row-org">${escapeHtml(c.org || "—")}</div>
-        ${c.project ? `<div class="row-project">${escapeHtml(c.project)}</div>` : ""}
-      </div>
-      <div class="row-last">
-        <div class="type">${le ? le.type : "Added"}</div>
-        <div class="date">${fmtDate(le ? le.date : c.createdAt.slice(0,10))}</div>
-      </div>
-    </div>`;
-  }).join("");
-}
-function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-
-/* ============ Sheets ============ */
-function openSheet(id){ $("backdrop").classList.add("open"); $(id).classList.add("open"); }
-function closeSheets(){
-  $("backdrop").classList.remove("open");
-  ["editSheet","detailSheet","settingsSheet"].forEach(id => $(id).classList.remove("open"));
-}
-$("backdrop").addEventListener("click", closeSheets);
-
-/* ============ Add / Edit new contact ============ */
-function resetEditForm(){
-  ["fName","fOrg","fProject","fPhone","fEmail","fNotes"].forEach(id => $(id).value = "");
-  $("fType").value = "Met";
-  $("fDate").value = todayStr();
-  pendingPhoto = { thumb:null, image:null };
-  $("editPhotoPreview").classList.add("hidden");
-  $("ocrStatus").classList.add("hidden");
-  $("editTitle").textContent = "New contact";
-}
-
-/* ============ OCR (on-device, via Tesseract.js) ============ */
-function parseCardText(text){
-  const rawLines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  const emailRe = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-  const phoneRe = /(\+?\d[\d\s().-]{6,}\d)/;
-  const orgRe = /\b(inc|ltd|llc|corp|co\.?|company|group|industries|solutions|enterprises|pvt|limited|technologies|systems|associates|partners|studio)\b/i;
-  const namePatternRe = /^[A-Z][a-zA-Z.'-]+(\s+[A-Z][a-zA-Z.'-]+){1,3}$/;
-
-  let email = "", phone = "", org = "", name = "";
-  const used = new Set();
-
-  rawLines.forEach((line, i) => {
-    if(!email){ const m = line.match(emailRe); if(m){ email = m[0]; used.add(i); } }
-  });
-  rawLines.forEach((line, i) => {
-    if(!phone && !used.has(i)){ const m = line.match(phoneRe); if(m && m[0].replace(/\D/g,"").length >= 7){ phone = m[0].trim(); used.add(i); } }
-  });
-  rawLines.forEach((line, i) => {
-    if(!org && !used.has(i) && orgRe.test(line)){ org = line; used.add(i); }
-  });
-  rawLines.forEach((line, i) => {
-    if(!name && !used.has(i) && namePatternRe.test(line)){ name = line; used.add(i); }
-  });
-  if(!name){
-    const fallback = rawLines.find((l, i) => !used.has(i));
-    if(fallback){ name = fallback; used.add(rawLines.indexOf(fallback)); }
-  }
-  if(!org){
-    const fallback = rawLines.find((l, i) => !used.has(i));
-    if(fallback){ org = fallback; used.add(rawLines.indexOf(fallback)); }
-  }
-  const leftover = rawLines.filter((l, i) => !used.has(i));
-  return { name, org, phone, email, leftover: leftover.join("\n") };
-}
-
-async function runOCRAndFill(file){
-  if(typeof Tesseract === "undefined"){
-    showToast("OCR library still loading — you can fill details in manually");
-    return;
-  }
-  $("ocrStatus").classList.remove("hidden");
-  try{
-    const { data } = await Tesseract.recognize(file, "eng");
-    const parsed = parseCardText(data.text || "");
-    if(!$("fName").value && parsed.name) $("fName").value = parsed.name;
-    if(!$("fOrg").value && parsed.org) $("fOrg").value = parsed.org;
-    if(!$("fPhone").value && parsed.phone) $("fPhone").value = parsed.phone;
-    if(!$("fEmail").value && parsed.email) $("fEmail").value = parsed.email;
-    if(parsed.leftover && !$("fNotes").value){
-      $("fNotes").value = "Detected on card:\n" + parsed.leftover;
-    }
-    showToast("Filled in what we could read — please check before saving");
-  }catch(err){
-    console.error(err);
-    showToast("Couldn't read the card text — fill in manually");
-  }finally{
-    $("ocrStatus").classList.add("hidden");
-  }
-}
-
-$("scanBtn").addEventListener("click", () => { resetEditForm(); $("cameraInput").click(); });
-$("addBtn").addEventListener("click", () => { resetEditForm(); openSheet("editSheet"); });
-
-$("cameraInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if(!file) return;
-  const { thumb, image } = await processImageFile(file);
-  pendingPhoto = { thumb, image };
-  $("editPhotoPreview").src = image;
-  $("editPhotoPreview").classList.remove("hidden");
-  openSheet("editSheet");
-  runOCRAndFill(file);
-});
-
-$("editRetakeBtn").addEventListener("click", () => $("cameraInput").click());
-$("editClose").addEventListener("click", closeSheets);
-
-$("saveBtn").addEventListener("click", async () => {
-  const name = $("fName").value.trim();
-  if(!name){ showToast("Add a name before saving"); return; }
-  const now = new Date().toISOString();
-  const contact = {
-    id: uid(),
-    name,
-    org: $("fOrg").value.trim(),
-    project: $("fProject").value.trim(),
-    phone: $("fPhone").value.trim(),
-    email: $("fEmail").value.trim(),
-    notes: $("fNotes").value.trim(),
-    thumb: pendingPhoto.thumb,
-    image: pendingPhoto.image,
-    history: [{ type: $("fType").value, date: $("fDate").value || todayStr() }],
-    createdAt: now,
-    updatedAt: now
-  };
-  await put("contacts", contact);
-  contacts.push(contact);
-  renderList();
-  closeSheets();
-  showToast("Contact saved");
-});
-
-/* ============ Detail view ============ */
-function openDetail(id){
-  const c = contacts.find(x => x.id === id);
-  if(!c) return;
-  activeId = id;
-  $("detailName").textContent = c.name || "Unnamed";
-  $("dName").value = c.name || "";
-  $("dOrg").value = c.org || "";
-  $("dProject").value = c.project || "";
-  $("dPhone").value = c.phone || "";
-  $("dEmail").value = c.email || "";
-  $("dNotes").value = c.notes || "";
-  $("dLogDate").value = todayStr();
-  if(c.image){ $("detailPhoto").src = c.image; $("detailPhoto").classList.remove("hidden"); }
-  else { $("detailPhoto").classList.add("hidden"); }
-  renderHistory(c);
-  openSheet("detailSheet");
-}
-
-function renderHistory(c){
-  const items = (c.history||[]).slice().sort((a,b)=> a.date < b.date ? 1 : -1);
-  $("dHistory").innerHTML = items.map(h => `
-    <div class="history-item">
-      <div>
-        <span class="h-type">${escapeHtml(h.type)}</span>
-        ${h.note ? `<span class="h-note">${escapeHtml(h.note)}</span>` : ""}
-      </div>
-      <div class="h-date">${fmtDate(h.date)}</div>
-    </div>`).join("") || `<div class="settings-note">No interactions logged yet.</div>`;
-}
-
-$("listWrap").addEventListener("click", (e) => {
-  const row = e.target.closest(".row");
-  if(row) openDetail(row.dataset.id);
-});
-$("detailClose").addEventListener("click", closeSheets);
-
-$("dSaveBtn").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
-  if(!c) return;
-  c.name = $("dName").value.trim() || c.name;
-  c.org = $("dOrg").value.trim();
-  c.project = $("dProject").value.trim();
-  c.phone = $("dPhone").value.trim();
-  c.email = $("dEmail").value.trim();
-  c.notes = $("dNotes").value.trim();
-  c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  $("detailName").textContent = c.name;
-  renderList();
-  showToast("Changes saved");
-});
-
-$("dLogAdd").addEventListener("click", async () => {
-  const c = contacts.find(x => x.id === activeId);
-  if(!c) return;
-  c.history = c.history || [];
-  c.history.push({ type: $("dLogType").value, date: $("dLogDate").value || todayStr() });
-  c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  renderHistory(c);
-  renderList();
-  showToast("Interaction logged");
-});
-
-$("dRetakeBtn").addEventListener("click", () => $("retakeInput").click());
-$("retakeInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if(!file || !activeId) return;
-  const { thumb, image } = await processImageFile(file);
-  const c = contacts.find(x => x.id === activeId);
-  c.thumb = thumb; c.image = image; c.updatedAt = new Date().toISOString();
-  await put("contacts", c);
-  $("detailPhoto").src = image;
-  $("detailPhoto").classList.remove("hidden");
-  renderList();
-  showToast("Photo updated");
-});
-
-$("dDeleteBtn").addEventListener("click", async () => {
-  if(!activeId) return;
-  if(!confirm("Delete this contact? This can't be undone.")) return;
-  await del("contacts", activeId);
-  contacts = contacts.filter(c => c.id !== activeId);
-  renderList();
-  closeSheets();
-  showToast("Contact deleted");
-});
-
-/* ============ Search ============ */
-$("searchInput").addEventListener("input", renderList);
-
-/* ============ Settings / backup / restore ============ */
-$("settingsBtn").addEventListener("click", async () => {
-  $("clientIdInput").value = await getSetting("driveClientId", "");
-  const token = await getSetting("driveToken", null);
-  $("storageStatus").textContent = token ? "Synced with Google Drive" : "Stored on this device only";
-  $("storageStatus").className = "status-pill" + (token ? "" : "");
-  if(location.protocol === "file:") $("fileProtocolWarn").classList.remove("hidden");
-  const last = await getSetting("lastSync", null);
-  if(last){
-    $("lastSyncNote").textContent = "Last synced: " + new Date(last).toLocaleString();
-    $("lastSyncNote").classList.remove("hidden");
-  }
-  openSheet("settingsSheet");
-});
-$("settingsClose").addEventListener("click", closeSheets);
-
-$("backupBtn").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), contacts }, null, 2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `card-ledger-backup-${todayStr()}.json`;
-  a.click();
-  showToast("Backup downloaded");
-});
-
-$("restoreBtn").addEventListener("click", () => $("restoreInput").click());
-$("restoreInput").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  e.target.value = "";
-  if(!file) return;
-  try{
-    const data = JSON.parse(await file.text());
-    const incoming = Array.isArray(data.contacts) ? data.contacts : data;
-    if(!Array.isArray(incoming)) throw new Error("bad format");
-    let added = 0;
-    for(const c of incoming){
-      if(!c.id) c.id = uid();
-      const existing = contacts.find(x => x.id === c.id);
-      if(!existing || new Date(c.updatedAt||0) > new Date(existing.updatedAt||0)){
-        await put("contacts", c);
-        contacts = contacts.filter(x => x.id !== c.id);
-        contacts.push(c);
-        added++;
-      }
-    }
-    renderList();
-    showToast(`Restored ${added} contact(s)`);
-  }catch(err){
-    showToast("Couldn't read that backup file");
-  }
-});
-
-/* ============ Google Drive sync ============ */
-const DRIVE_FILE_NAME = "card-ledger-backup.json";
-let tokenClient = null;
-let accessToken = null;
-
-async function ensureTokenClient(){
-  const clientId = $("clientIdInput").value.trim();
-  if(!clientId){ showToast("Paste your Google Client ID first"); return null; }
-  await setSetting("driveClientId", clientId);
-  if(typeof google === "undefined" || !google.accounts){
-    showToast("Google sign-in script hasn't loaded — check your connection");
-    return null;
-  }
-  if(!tokenClient || tokenClient._clientId !== clientId){
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: clientId,
-      scope: "https://www.googleapis.com/auth/drive.file",
-      callback: () => {}
-    });
-    tokenClient._clientId = clientId;
-  }
-  return tokenClient;
-}
-
-function requestToken(client){
-  return new Promise((resolve, reject) => {
-    client.callback = (resp) => {
-      if(resp.error) reject(resp);
-      else resolve(resp.access_token);
-    };
-    client.requestAccessToken({ prompt: accessToken ? "" : "consent" });
-  });
-}
-
-async function driveFindFile(token){
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE_NAME}'+and+trashed=false&spaces=drive&fields=files(id,name,modifiedTime)`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await res.json();
-  return (data.files && data.files[0]) || null;
-}
-
-async function driveDownload(token, fileId){
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  return res.json();
-}
-
-async function driveUpload(token, fileId, payload){
-  const body = JSON.stringify(payload);
-  const metadata = { name: DRIVE_FILE_NAME, mimeType: "application/json" };
-  const boundary = "cardledgerboundary";
-  const multipartBody =
-    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(fileId ? {} : metadata)}\r\n` +
-    `--${boundary}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${boundary}--`;
-  const url = fileId
-    ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
-    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
-  const res = await fetch(url, {
-    method: fileId ? "PATCH" : "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": `multipart/related; boundary=${boundary}` },
-    body: multipartBody
-  });
-  return res.json();
-}
-
-async function syncWithDrive(){
-  const client = await ensureTokenClient();
-  if(!client) return;
-  try{
-    showToast("Connecting to Google Drive…");
-    accessToken = await requestToken(client);
-    await setSetting("driveToken", true);
-
-    const existing = await driveFindFile(accessToken);
-    let merged = contacts.slice();
-
-    if(existing){
-      const remote = await driveDownload(accessToken, existing.id);
-      const remoteContacts = Array.isArray(remote.contacts) ? remote.contacts : [];
-      const byId = {};
-      merged.forEach(c => byId[c.id] = c);
-      remoteContacts.forEach(rc => {
-        const local = byId[rc.id];
-        if(!local || new Date(rc.updatedAt||0) > new Date(local.updatedAt||0)){
-          byId[rc.id] = rc;
-        }
-      });
-      merged = Object.values(byId);
-      for(const c of merged) await put("contacts", c);
-      contacts = merged;
-    }
-
-    await driveUpload(accessToken, existing ? existing.id : null, { exportedAt: new Date().toISOString(), contacts: merged });
-    await setSetting("lastSync", new Date().toISOString());
-    renderList();
-    showToast("Synced with Google Drive");
-  }catch(err){
-    console.error(err);
-    showToast("Drive sync failed — check the Client ID and origin setup");
-  }
-}
-
-$("connectDriveBtn").addEventListener("click", syncWithDrive);
-$("syncBtn").addEventListener("click", syncWithDrive);
-$("disconnectDriveBtn").addEventListener("click", async () => {
-  accessToken = null;
-  await setSetting("driveToken", null);
-  showToast("Disconnected from Drive");
-  $("storageStatus").textContent = "Stored on this device only";
-});
-
-/* ============ Boot ============ */
-(async function init(){
-  contacts = await getAll("contacts");
-  renderList();
-  const clientId = await getSetting("driveClientId", "");
-  if(clientId) $("clientIdInput").value = clientId;
-})();
-
-})();
-</script>
-</body>
-</html>
+  const q = $("searchInput").value.trim().toLowerCase
